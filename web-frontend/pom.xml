@@ -37,7 +37,7 @@
                       <goal>npm</goal>
                     </goals>
                     <configuration>
-                      <arguments>ci</arguments>
+                      <arguments>clean-install</arguments>
                     </configuration>
                   </execution>
 
