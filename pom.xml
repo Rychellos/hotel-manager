@@ -33,13 +33,13 @@
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <springdoc.version>3.0.0</springdoc.version>
         <jwt.version>0.13.0</jwt.version>
-        <!--        This is used by JaCoCo and without it static code analysis will complain -->
-        <argLine />
+        <!-- This is used by JaCoCo and without it static code analysis will complain -->
+        <argLine/>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <!--            SPRING            -->
+            <!--SPRING -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -52,7 +52,7 @@
                 <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${springdoc.version}</version>
             </dependency>
-            <!--            CODE GENERATION            -->
+            <!-- CODE GENERATION -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -64,7 +64,7 @@
                 <artifactId>mapstruct</artifactId>
                 <version>${org.mapstruct.version}</version>
             </dependency>
-            <!--            JSON STUFF            -->
+            <!-- JSON STUFF -->
             <dependency>
                 <groupId>com.github.java-json-tools</groupId>
                 <artifactId>json-patch</artifactId>
@@ -85,7 +85,7 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jwt.version}</version>
             </dependency>
-            <!--            TESTING            -->
+            <!-- TESTING -->
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>

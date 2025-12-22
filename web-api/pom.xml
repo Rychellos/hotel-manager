@@ -13,9 +13,16 @@
     <packaging>jar</packaging>
 
     <dependencies>
-        <!--        ALL THE MODULES GO HERE        -->
+        <!-- ALL THE MODULES GO HERE -->
+        <dependency>
+            <groupId>pl.rychellos.hotel</groupId>
+            <artifactId>web-frontend</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
 
-        <!--        SPRING        -->
+        <!-- SPRING -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
