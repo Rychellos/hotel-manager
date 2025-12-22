@@ -18,6 +18,8 @@
             <groupId>pl.rychellos.hotel</groupId>
             <artifactId>web-frontend</artifactId>
             <version>0.1-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
         </dependency>
 
         <!-- SPRING -->
