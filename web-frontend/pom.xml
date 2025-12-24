@@ -30,21 +30,34 @@
                         </configuration>
                     </execution>
 
-                  <execution>
-                    <id>npm-install</id>
-                    <phase>generate-resources</phase>
-                    <goals>
-                      <goal>npm</goal>
-                    </goals>
-                    <configuration>
-                      <arguments>clean-install</arguments>
-                    </configuration>
-                  </execution>
-
                     <execution>
-                        <id>npm-build</id>
+                        <id>Install pnpm</id>
                         <goals>
                             <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install -g pnpm@latest-10</arguments>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>pnpm-install</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>pnpm-build</id>
+                        <goals>
+                            <goal>pnpm</goal>
                         </goals>
                         <configuration>
                             <arguments>run build</arguments>
