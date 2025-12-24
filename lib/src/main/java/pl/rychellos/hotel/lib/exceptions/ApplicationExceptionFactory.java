@@ -14,7 +14,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException badRequest(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.badRequest"),
+                langUtil.getMessage("error.generic.badRequest.title"),
                 detail,
                 HttpStatus.BAD_REQUEST
         );
@@ -22,7 +22,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException unauthorized(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.unauthorized"),
+                langUtil.getMessage("error.generic.unauthorized.title"),
                 detail,
                 HttpStatus.UNAUTHORIZED
         );
@@ -30,7 +30,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException forbidden(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.forbidden"),
+                langUtil.getMessage("error.generic.forbidden.title"),
                 detail,
                 HttpStatus.FORBIDDEN
         );
@@ -38,7 +38,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException resourceNotFound(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.notFound"),
+                langUtil.getMessage("error.generic.notFound.title"),
                 detail,
                 HttpStatus.NOT_FOUND
         );
@@ -46,7 +46,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException methodNotAllowed(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.methodNotAllowed"),
+                langUtil.getMessage("error.generic.methodNotAllowed.title"),
                 detail,
                 HttpStatus.METHOD_NOT_ALLOWED
         );
@@ -54,7 +54,7 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException conflict(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.conflict"),
+                langUtil.getMessage("error.generic.conflict.title"),
                 detail,
                 HttpStatus.CONFLICT
         );
