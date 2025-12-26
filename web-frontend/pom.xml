@@ -23,28 +23,32 @@
                     <execution>
                         <id>install-node</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-pnpm</goal>
                         </goals>
                         <configuration>
                             <nodeVersion>v24.12.0</nodeVersion>
+                            <pnpmVersion>10.0.0</pnpmVersion>
                         </configuration>
                     </execution>
 
-                  <execution>
-                    <id>npm-install</id>
-                    <phase>generate-resources</phase>
-                    <goals>
-                      <goal>npm</goal>
-                    </goals>
-                    <configuration>
-                      <arguments>clean-install</arguments>
-                    </configuration>
-                  </execution>
+                    <execution>
+                        <id>pnpm-install</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>pnpm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install</arguments>
+                            <environmentVariables>
+                                <CI>true</CI>
+                            </environmentVariables>
+                        </configuration>
+                    </execution>
 
                     <execution>
-                        <id>npm-build</id>
+                        <id>pnpm-build</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>pnpm</goal>
                         </goals>
                         <configuration>
                             <arguments>run build</arguments>
