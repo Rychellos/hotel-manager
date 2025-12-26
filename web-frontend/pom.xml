@@ -26,17 +26,17 @@
                             <goal>install-node-and-npm</goal>
                         </goals>
                         <configuration>
-                            <nodeVersion>v24.12.0</nodeVersion>
+                            <nodeVersion>v20.11.1</nodeVersion>
                         </configuration>
                     </execution>
 
                     <execution>
-                        <id>Install pnpm</id>
+                        <id>install-pnpm</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>install-pnpm</goal>
                         </goals>
                         <configuration>
-                            <arguments>install -g pnpm@latest-10</arguments>
+                            <pnpmVersion>10.0.0</pnpmVersion>
                         </configuration>
                     </execution>
 
