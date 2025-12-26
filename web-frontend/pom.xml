@@ -33,7 +33,7 @@
                     <execution>
                         <id>Install pnpm</id>
                         <goals>
-                            <goal>npm</goal>
+                            <goal>pnpm</goal>
                         </goals>
                         <configuration>
                             <arguments>install -g pnpm@latest-10</arguments>
