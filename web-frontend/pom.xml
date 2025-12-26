@@ -23,20 +23,10 @@
                     <execution>
                         <id>install-node</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>install-node-and-pnpm</goal>
                         </goals>
                         <configuration>
                             <nodeVersion>v20.11.1</nodeVersion>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>install-pnpm</id>
-                        <goals>
-                            <goal>install-pnpm</goal>
-                        </goals>
-                        <configuration>
-                            <pnpmVersion>10.0.0</pnpmVersion>
                         </configuration>
                     </execution>
 
