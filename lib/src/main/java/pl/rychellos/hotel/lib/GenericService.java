@@ -15,7 +15,7 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.util.Collection;
 
-public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter> {
+public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter> implements IGenericService<Entity, DTO, Filter> {
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
 
