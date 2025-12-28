@@ -22,5 +22,5 @@ public interface IGenericService<Entity extends BaseEntity, DTO extends BaseDTO,
 
     DTO patch(long id, JsonPatch patch) throws ApplicationException;
 
-    void deleteOne(long id);
+    void delete(long id);
 }
