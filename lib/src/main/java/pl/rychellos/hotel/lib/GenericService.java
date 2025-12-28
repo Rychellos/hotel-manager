@@ -16,6 +16,7 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 import java.util.Collection;
 
 public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter> implements IGenericService<Entity, DTO, Filter> {
+    private final EntitySpecificationBuilder<Entity> specification = new EntitySpecificationBuilder<>();
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
 
@@ -36,7 +37,9 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         this.objectMapper = objectMapper;
     }
 
-    protected abstract Specification<Entity> createSpecification(Filter filter);
+    protected Specification<Entity> createSpecification(Filter currencyDTOFilter) {
+        return specification.build(currencyDTOFilter);
+    }
 
     public Page<DTO> getAllPaginated(Pageable pageable, Filter filter) {
         return repository.findAll(createSpecification(filter), pageable).map(mapper::toDTO);
