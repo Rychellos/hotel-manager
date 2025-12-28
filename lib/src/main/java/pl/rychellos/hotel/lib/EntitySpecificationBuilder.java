@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Supports: Nested paths, Range queries, Join management, and Strategy-based filtering.
  */
 @Slf4j
-public class EntitySpecificationBuilder<DTO extends BaseDTO> {
+public class EntitySpecificationBuilder<DTO extends BaseEntity> {
     // Cache to avoid aggressive reflection lookups on every request
     private static final Map<Class<?>, List<CachedField>> FIELD_CACHE = new ConcurrentHashMap<>();
 
