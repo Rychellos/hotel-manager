@@ -1,5 +1,6 @@
 package pl.rychellos.hotel.lib.lang;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +42,7 @@ public class LangConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    @org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean(name = "messageSource")
+    @ConditionalOnMissingBean(name = "messageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 
