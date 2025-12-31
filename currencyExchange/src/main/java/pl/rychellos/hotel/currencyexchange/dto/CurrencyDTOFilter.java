@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange.dto;
+package pl.rychellos.hotel.currencyexchange.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange.contract;
+package pl.rychellos.hotel.currencyexchange.contract;
 
 import java.time.LocalDate;
 

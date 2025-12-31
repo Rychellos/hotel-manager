@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
