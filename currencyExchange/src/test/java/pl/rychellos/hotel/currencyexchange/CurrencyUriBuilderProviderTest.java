@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.web.util.UriComponentsBuilder;

@@ -1,7 +1,7 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
-import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTO;
-import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTOFilter;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTOFilter;
 import pl.rychellos.hotel.lib.IGenericService;
 
 import java.time.LocalDate;

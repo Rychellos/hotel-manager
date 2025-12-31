@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import org.springframework.beans.factory.annotation.Value;
 

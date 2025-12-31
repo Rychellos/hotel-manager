@@ -1,14 +1,12 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
-import org.springframework.test.context.ContextConfiguration;
-import pl.rychellos.hotel.currencyExchange.configuration.CurrencyAutoConfig;
-import pl.rychellos.hotel.currencyExchange.configuration.CurrencyClientConfig;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -17,17 +15,15 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
-@ContextConfiguration(classes = {
-    CurrencyClientConfig.class,
-    CurrencyAutoConfig.class
-})
-@EnableAutoConfiguration
 class CurrencyRepositoryTest {
-    @Autowired
-    private CurrencyRepository currencyRepository;
+    @Configuration
+    @EnableJpaRepositories(basePackageClasses = CurrencyRepository.class)
+    @EntityScan(basePackageClasses = CurrencyEntity.class)
+    static class TestConfig {
+    }
 
     @Autowired
-    private TestEntityManager entityManager;
+    private CurrencyRepository currencyRepository;
 
     private static final LocalDate TEST_DATE = LocalDate.of(2025, 12, 23);
 

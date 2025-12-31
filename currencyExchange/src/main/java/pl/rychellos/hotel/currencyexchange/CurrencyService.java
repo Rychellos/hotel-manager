@@ -1,13 +1,13 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import pl.rychellos.hotel.currencyExchange.contract.CurrencyFetch;
-import pl.rychellos.hotel.currencyExchange.contract.CurrencyRate;
-import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTO;
-import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTOFilter;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTOFilter;
 import pl.rychellos.hotel.lib.GenericMapper;
 import pl.rychellos.hotel.lib.GenericRepository;
 import pl.rychellos.hotel.lib.GenericService;
@@ -33,6 +33,7 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
         ICurrencyClient currencyClient
     ) {
         super(langUtil, clazz, mapper, repository, exceptionFactory, objectMapper);
+        this.repository = (CurrencyRepository) repository;
         this.currencyClient = currencyClient;
     }
 

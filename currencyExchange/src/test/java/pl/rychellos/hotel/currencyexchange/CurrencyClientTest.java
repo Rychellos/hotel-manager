@@ -1,4 +1,4 @@
-package pl.rychellos.hotel.currencyExchange;
+package pl.rychellos.hotel.currencyexchange;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.util.UriComponentsBuilder;
-import pl.rychellos.hotel.currencyExchange.contract.CurrencyFetch;
-import pl.rychellos.hotel.currencyExchange.contract.CurrencyRate;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;

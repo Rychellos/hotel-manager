@@ -1,14 +1,14 @@
-package pl.rychellos.hotel.currencyExchange.configuration;
+package pl.rychellos.hotel.currencyexchange.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.client.RestClient;
-import pl.rychellos.hotel.currencyExchange.CurrencyClient;
-import pl.rychellos.hotel.currencyExchange.CurrencyUriBuilderProvider;
-import pl.rychellos.hotel.currencyExchange.ICurrencyClient;
-import pl.rychellos.hotel.currencyExchange.ICurrencyUriBuilderProvider;
+import pl.rychellos.hotel.currencyexchange.CurrencyClient;
+import pl.rychellos.hotel.currencyexchange.CurrencyUriBuilderProvider;
+import pl.rychellos.hotel.currencyexchange.ICurrencyClient;
+import pl.rychellos.hotel.currencyexchange.ICurrencyUriBuilderProvider;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
