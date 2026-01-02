@@ -22,10 +22,26 @@
             <scope>import</scope>
         </dependency>
 
+        <dependency>
+            <groupId>pl.rychellos.hotel</groupId>
+            <artifactId>authorization</artifactId>
+            <version>0.1-SNAPSHOT</version>
+        </dependency>
+
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- OTHER -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 
@@ -50,9 +66,8 @@
                             <resources>
                                 <resource>
                                     <directory>
-                                        ${project.parent.basedir}/frontend/dist
+                                        ${project.parent.basedir}/web-frontend/dist/web-frontend/browser
                                     </directory>
-                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>

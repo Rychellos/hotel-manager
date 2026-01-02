@@ -1,10 +1,12 @@
-package pl.rychellos.hotel.lib.exceptions;
+package pl.rychellos.hotel.webapi;
 
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
