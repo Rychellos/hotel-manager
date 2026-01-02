@@ -2,7 +2,6 @@ package pl.rychellos.hotel.webapi.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -18,12 +17,13 @@ import pl.rychellos.hotel.authorization.service.JwtService;
 class SecurityFilterChainConfiguration {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final AuthenticationProvider authenticationProvider;
 
-    SecurityFilterChainConfiguration(JwtService jwtService, UserDetailsService userDetailsService, AuthenticationProvider authenticationProvider) {
+    SecurityFilterChainConfiguration(
+        JwtService jwtService,
+        UserDetailsService userDetailsService
+    ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.authenticationProvider = authenticationProvider;
     }
 
     @Bean
@@ -33,19 +33,23 @@ class SecurityFilterChainConfiguration {
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
             .authorizeHttpRequests(req -> req
                 .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/*.js",
+                    "/*.css",
+                    "/*.ico",
+                    "/*.png",
+                    "/*.svg",
+                    "/*.json",
+                    "/assets/**",
                     "/api/v1/auth/**",
-                    "/v3/api-docs/**",
-                    "/swagger-ui/**",
-                    "/swagger-ui.html",
-                    "/error",
-                    "/h2-console/**"
+                    "/error"
                 )
                 .permitAll()
                 .anyRequest()
                 .authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider)
             .addFilterBefore(new JwtAuthenticationFilter(jwtService, userDetailsService, handlerExceptionResolver), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

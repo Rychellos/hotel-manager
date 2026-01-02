@@ -16,7 +16,6 @@ import pl.rychellos.hotel.authorization.configuration.CustomPermissionEvaluator;
 @Component
 @RequiredArgsConstructor
 public class SecurityAspect {
-
     private final CustomPermissionEvaluator permissionEvaluator;
 
     @Before("@annotation(checkPermission)")
@@ -28,7 +27,7 @@ public class SecurityAspect {
             log.info("No authentication context. Aborting");
             throw new AccessDeniedException("No authentication found");
         }
-
+        
         boolean hasPermission = permissionEvaluator.hasPermission(
             authentication,
             checkPermission.target(),
@@ -38,5 +37,7 @@ public class SecurityAspect {
         if (!hasPermission) {
             throw new AccessDeniedException("Access denied");
         }
+
+        log.info("User authorized");
     }
 }

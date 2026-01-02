@@ -25,9 +25,13 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final ApplicationExceptionFactory exceptionFactory;
 
-    public AuthService(UserRepository userRepository, JwtService jwtService,
-                       AuthenticationManager authenticationManager, RefreshTokenService refreshTokenService,
-                       ApplicationExceptionFactory exceptionFactory) {
+    public AuthService(
+        UserRepository userRepository,
+        JwtService jwtService,
+        AuthenticationManager authenticationManager,
+        RefreshTokenService refreshTokenService,
+        ApplicationExceptionFactory exceptionFactory
+    ) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -37,7 +41,8 @@ public class AuthService {
 
     public AuthResult authenticate(AuthRequest request) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+            new UsernamePasswordAuthenticationToken(request.username(), request.password())
+        );
 
         UserEntity user = userRepository.findByUsername(request.username())
             .orElseThrow(() -> exceptionFactory.resourceNotFound("User not found"));
