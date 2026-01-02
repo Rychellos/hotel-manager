@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.authorization.user.UserEntity;
+import pl.rychellos.hotel.authorization.user.UserRepository;
+import pl.rychellos.hotel.authorization.user.UserService;
 import pl.rychellos.hotel.authorization.user.dto.UserDTO;
 import pl.rychellos.hotel.authorization.user.dto.UserFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
-import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -21,10 +22,12 @@ import pl.rychellos.hotel.lib.security.ActionType;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
-public class UserController extends GenericController<UserEntity, UserDTO, UserFilterDTO> {
-
-    protected UserController(GenericService<UserEntity, UserDTO, UserFilterDTO> service,
-                             ApplicationExceptionFactory applicationExceptionFactory, LangUtil langUtil) {
+public class UserController extends GenericController<UserEntity, UserDTO, UserFilterDTO, UserRepository> {
+    protected UserController(
+        UserService service,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         super(service, applicationExceptionFactory, langUtil);
     }
 

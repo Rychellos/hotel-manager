@@ -9,7 +9,6 @@ import pl.rychellos.hotel.currencyExchange.contract.CurrencyRate;
 import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTO;
 import pl.rychellos.hotel.currencyExchange.dto.CurrencyDTOFilter;
 import pl.rychellos.hotel.lib.GenericMapper;
-import pl.rychellos.hotel.lib.GenericRepository;
 import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
@@ -19,7 +18,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
-public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyDTOFilter> implements ICurrencyService {
+public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyDTOFilter, CurrencyRepository> implements ICurrencyService {
     protected CurrencyRepository repository;
     protected ICurrencyClient currencyClient;
 
@@ -27,7 +26,7 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
         LangUtil langUtil,
         Class<CurrencyDTO> clazz,
         GenericMapper<CurrencyEntity, CurrencyDTO> mapper,
-        GenericRepository<CurrencyEntity> repository,
+        CurrencyRepository repository,
         ApplicationExceptionFactory exceptionFactory,
         ObjectMapper objectMapper,
         ICurrencyClient currencyClient

@@ -7,19 +7,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
+import pl.rychellos.hotel.authorization.role.RoleRepository;
+import pl.rychellos.hotel.authorization.role.RoleService;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
 import pl.rychellos.hotel.authorization.role.dto.RoleFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
-import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @RestController
 @RequestMapping("/api/v1/roles")
-public class RoleController extends GenericController<RoleEntity, RoleDTO, RoleFilterDTO> {
+public class RoleController extends GenericController<RoleEntity, RoleDTO, RoleFilterDTO, RoleRepository> {
 
-    protected RoleController(GenericService<RoleEntity, RoleDTO, RoleFilterDTO> service,
-                             ApplicationExceptionFactory applicationExceptionFactory, LangUtil langUtil) {
+    protected RoleController(
+        RoleService service,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         super(service, applicationExceptionFactory, langUtil);
     }
 

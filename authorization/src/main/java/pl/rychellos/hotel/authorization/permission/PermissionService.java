@@ -9,7 +9,7 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @Service
-public class PermissionService extends GenericService<PermissionEntity, PermissionDTO, PermissionFilterDTO> {
+public class PermissionService extends GenericService<PermissionEntity, PermissionDTO, PermissionFilterDTO, PermissionRepository> {
     public PermissionService(
         LangUtil languageUtil,
         PermissionMapper mapper,
