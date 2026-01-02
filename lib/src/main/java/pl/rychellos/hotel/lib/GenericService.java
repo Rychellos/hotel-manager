@@ -63,15 +63,15 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     }
 
     public DTO save(DTO dto) {
-        var e = mapper.toEntity(dto);
-        var e2 = repository.save(e);
-        var dto2 = mapper.toDTO(e2);
-
-        return dto2;
+        return mapper.toDTO(
+            repository.save(
+                mapper.toEntity(dto)
+            )
+        );
     }
 
     public DTO saveIfNotExists(DTO dto) throws ApplicationException {
-        if (repository.existsById(dto.getId())) {
+        if (exists(dto.getId())) {
             throw exceptionFactory.conflict(langUtil.getMessage("error.generic.alreadyExists.message"));
         }
 
