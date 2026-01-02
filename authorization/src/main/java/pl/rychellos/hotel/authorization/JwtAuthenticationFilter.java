@@ -29,7 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void processToken(HttpServletRequest request) throws ApplicationException {
-        log.info("Started processing token");
+        log.info("Started processing access token");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String jwt;
         String userEmail;
@@ -81,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return true;
         }
 
-        return path.startsWith("/api/auth/login");
+        return path.startsWith("/api/v1/auth/login");
     }
 
     @Override
@@ -93,10 +93,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             processToken(request);
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
-            log.info("Failed to process a token", e);
+        } catch (ApplicationException applicationException) {
+            log.info("Failed to process a token: {}", applicationException.getDetail());
+
             if (!response.isCommitted()) {
-                handlerExceptionResolver.resolveException(request, response, null, e);
+                handlerExceptionResolver.resolveException(request, response, null, applicationException);
+            }
+        } catch (Exception exception) {
+            log.info("Failed to process a token", exception);
+
+            if (!response.isCommitted()) {
+                handlerExceptionResolver.resolveException(request, response, null, exception);
             }
         }
     }

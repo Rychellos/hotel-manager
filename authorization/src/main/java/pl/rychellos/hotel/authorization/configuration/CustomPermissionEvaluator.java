@@ -5,6 +5,8 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import pl.rychellos.hotel.lib.security.ActionScope;
+import pl.rychellos.hotel.lib.security.ActionType;
 import pl.rychellos.hotel.lib.security.PermissionDef;
 
 import java.io.Serializable;
@@ -44,12 +46,12 @@ public class CustomPermissionEvaluator implements PermissionEvaluator {
                 || grantedAuthority.equals("ROLE_ADMIN"));
     }
 
-    public boolean hasPermission(Authentication authentication, String target, String action, String scope) {
-        String requiredPermission = PermissionDef.buildInternalString(target, action, scope);
+    public boolean hasPermission(Authentication authentication, String target, ActionType action, ActionScope scope) {
+        String requiredPermission = PermissionDef.buildInternalString(target, action.toString(), scope.toString());
+
         return authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
             .filter(Objects::nonNull)
-            .anyMatch(grantedAuthority -> grantedAuthority.equals(requiredPermission)
-                || grantedAuthority.equals("ROLE_ADMIN"));
+            .anyMatch(grantedAuthority -> grantedAuthority.equals(requiredPermission) || grantedAuthority.equals("ROLE_ADMIN"));
     }
 }
