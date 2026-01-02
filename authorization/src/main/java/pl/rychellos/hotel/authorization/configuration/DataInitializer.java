@@ -76,12 +76,13 @@ public class DataInitializer implements CommandLineRunner, ApplicationListener<C
             String adminUsername = "admin";
             String rawPassword = UUID.randomUUID().toString();
 
-            UserEntity admin = UserEntity.builder()
-                .username(adminUsername)
-                .password(passwordEncoder.encode(rawPassword))
-                .email("admin@hotel.com")
-                .roles(new HashSet<>(Set.of(adminRole)))
-                .build();
+            UserEntity admin = new UserEntity(
+                null,
+                adminUsername,
+                passwordEncoder.encode(rawPassword),
+                "admin@hotel.com",
+                new HashSet<>(Set.of(adminRole))
+            );
 
             log.warn("Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}", adminUsername, rawPassword);
 

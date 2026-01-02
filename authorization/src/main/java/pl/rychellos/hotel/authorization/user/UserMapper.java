@@ -20,29 +20,31 @@ public interface UserMapper extends GenericMapper<UserEntity, UserDTO> {
     @Override
     @Mapping(target = "roles", source = "roleIds")
     @Mapping(target = "password", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
     UserEntity toEntity(UserDTO dto);
 
     @Mapping(target = "password", ignore = true)
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "roles", source = "roleIds")
+    @Mapping(target = "authorities", ignore = true)
     void updateEntityFromDTO(@MappingTarget UserEntity entity, UserDTO dto);
 
     default Set<Long> mapRolesToIds(Set<RoleEntity> roles) {
         if (roles == null)
             return null;
         return roles.stream()
-                .map(RoleEntity::getId)
-                .collect(Collectors.toSet());
+            .map(RoleEntity::getId)
+            .collect(Collectors.toSet());
     }
 
     default Set<RoleEntity> mapIdsToRoles(Set<Long> ids) {
         if (ids == null)
             return null;
         return ids.stream()
-                .map(id -> {
-                    RoleEntity role = new RoleEntity();
-                    role.setId(id);
-                    return role;
-                })
-                .collect(Collectors.toSet());
+            .map(id -> {
+                RoleEntity role = new RoleEntity();
+                role.setId(id);
+                return role;
+            })
+            .collect(Collectors.toSet());
     }
 }
