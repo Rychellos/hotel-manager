@@ -9,7 +9,7 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @Service
-public class RoleService extends GenericService<RoleEntity, RoleDTO, RoleFilterDTO> {
+public class RoleService extends GenericService<RoleEntity, RoleDTO, RoleFilterDTO, RoleRepository> {
     public RoleService(
         RoleRepository repository,
         RoleMapper mapper,

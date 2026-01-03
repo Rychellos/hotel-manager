@@ -9,10 +9,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Production-Grade Specification Builder.
- * Supports: Nested paths, Range queries, Join management, and Strategy-based filtering.
- */
 @Slf4j
 public class EntitySpecificationBuilder<DTO extends BaseEntity> {
     // Cache to avoid aggressive reflection lookups on every request
@@ -23,12 +19,12 @@ public class EntitySpecificationBuilder<DTO extends BaseEntity> {
 
     /**
      * Builds a specification based on the DTO.
-     * Note: We do not cache the Specification itself as values change,
-     * but we cache the structure introspection.
+     * Note: It does not cache the Specification itself as values change,
+     * but it caches the structure introspection.
      */
     public Specification<DTO> build(Object filterDto) {
         if (filterDto == null) {
-            return Specification.where((Specification<DTO>) null);
+            return Specification.anyOf();
         }
 
         return (root, query, cb) -> {
@@ -143,19 +139,13 @@ public class EntitySpecificationBuilder<DTO extends BaseEntity> {
             keyBuilder.append(part);
             String currentKey = keyBuilder.toString();
 
-            // If we are at the last part, just return get()
             if (i == parts.length - 1) {
                 path = path.get(part);
             } else {
-                // If it's an intermediate node, check if it's a Collection or a Single entity
-                // We blindly assume Join needed for complex paths to ensure correct filtering,
-                // or we could check the Metamodel. Here we use a simpler reuse strategy.
-                // NOTE: For true production safety, check `root.getModel().getAttribute(part).isCollection()`
-
                 Path<?> finalPath = path;
 
                 path = joinMap.computeIfAbsent(currentKey, k -> {
-                    if (finalPath instanceof From from) {
+                    if (finalPath instanceof From<?, ?> from) {
                         return from.join(part, JoinType.LEFT);
                     }
 

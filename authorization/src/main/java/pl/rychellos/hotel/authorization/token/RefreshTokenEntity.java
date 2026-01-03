@@ -1,16 +1,18 @@
 package pl.rychellos.hotel.authorization.token;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 
 import java.time.Instant;
 
+@Entity
 @Getter
 @Setter
-@Entity
-@Table(name = "refresh_tokens")
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "refresh_token")
 public class RefreshTokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
