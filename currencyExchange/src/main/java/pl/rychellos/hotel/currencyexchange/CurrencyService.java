@@ -32,7 +32,7 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
         ICurrencyClient currencyClient
     ) {
         super(langUtil, clazz, mapper, repository, exceptionFactory, objectMapper);
-        this.repository = (CurrencyRepository) repository;
+        this.repository = repository;
         this.currencyClient = currencyClient;
     }
 
@@ -72,5 +72,10 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
     @Override
     public double calculateExchangeRate(String currencyCode, LocalDate effectiveDate, double amount) throws ApplicationException {
         return amount / get(currencyCode, effectiveDate).getMid();
+    }
+
+    @Override
+    protected void fetchRelations(CurrencyEntity entity, CurrencyDTO dto) {
+
     }
 }
