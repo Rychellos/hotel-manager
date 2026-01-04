@@ -28,12 +28,12 @@ class SecurityFilterChainConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver) throws Exception {
         http
-            .securityMatcher("/api/**")
+            .securityMatcher("/api/v1/**")
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(req -> req
                 .requestMatchers(
-                    "/api/auth/**"
+                    "/api/v1/auth/**"
                 )
                 .permitAll()
                 .anyRequest()

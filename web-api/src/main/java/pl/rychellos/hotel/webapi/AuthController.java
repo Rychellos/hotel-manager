@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.service.AuthService;
-import pl.rychellos.hotel.authorization.service.dto.AuthRequest;
-import pl.rychellos.hotel.authorization.service.dto.AuthResponse;
-import pl.rychellos.hotel.authorization.service.dto.AuthResult;
+import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResponseDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
 
 @Slf4j
 @RestController
@@ -22,21 +22,21 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponseDTO> login(@RequestBody AuthRequestDTO request, HttpServletResponse response) {
         log.info("Login attempt for user with username {}", request.username());
-        
-        AuthResult result = authService.authenticate(request);
+
+        AuthResultDTO result = authService.authenticate(request);
         setRefreshTokenCookie(response, result.refreshToken());
 
-        return ResponseEntity.ok(result.authResponse());
+        return ResponseEntity.ok(result.authResponseDTO());
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@CookieValue(name = "refresh_token") String refreshToken,
-                                                HttpServletResponse response) {
-        AuthResult result = authService.refreshToken(refreshToken);
+    public ResponseEntity<AuthResponseDTO> refresh(@CookieValue(name = "refresh_token") String refreshToken,
+                                                   HttpServletResponse response) {
+        AuthResultDTO result = authService.refreshToken(refreshToken);
         setRefreshTokenCookie(response, result.refreshToken());
-        return ResponseEntity.ok(result.authResponse());
+        return ResponseEntity.ok(result.authResponseDTO());
     }
 
     @PostMapping("/logout")
