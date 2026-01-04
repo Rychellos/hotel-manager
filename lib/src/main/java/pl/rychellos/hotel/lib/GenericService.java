@@ -37,6 +37,8 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         this.objectMapper = objectMapper;
     }
 
+    protected abstract void fetchRelations(Entity entity, DTO dto);
+
     protected Specification<Entity> createSpecification(Filter currencyDTOFilter) {
         return specification.build(currencyDTOFilter);
     }
@@ -63,11 +65,11 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     }
 
     public DTO save(DTO dto) {
-        return mapper.toDTO(
-            repository.save(
-                mapper.toEntity(dto)
-            )
-        );
+        Entity entity = mapper.toEntity(dto);
+
+        fetchRelations(entity, dto);
+
+        return mapper.toDTO(repository.save(entity));
     }
 
     public DTO saveIfNotExists(DTO dto) throws ApplicationException {
@@ -88,15 +90,17 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
 
         mapper.updateEntityFromDTO(entity, dto);
 
+        fetchRelations(entity, dto);
+
         return mapper.toDTO(repository.save(entity));
     }
 
     public DTO patch(long id, JsonPatch patch) throws ApplicationException {
-        DTO user = getById(id);
+        DTO dto = getById(id);
 
         JsonNode patched;
         try {
-            patched = patch.apply(objectMapper.convertValue(user, JsonNode.class));
+            patched = patch.apply(objectMapper.convertValue(dto, JsonNode.class));
         } catch (JsonPatchException e) {
             throw exceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
         }
