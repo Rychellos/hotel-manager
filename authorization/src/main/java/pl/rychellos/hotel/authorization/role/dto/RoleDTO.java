@@ -11,4 +11,5 @@ public class RoleDTO implements BaseDTO {
     private String name;
     private String description;
     private Set<Long> permissionIds;
+    private Set<Long> userIds;
 }

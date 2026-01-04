@@ -42,7 +42,6 @@ public class UserEntity implements UserDetails, BaseEntity {
     )
     private Set<RoleEntity> roles = new java.util.HashSet<>();
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = roles.stream()
             .map(role -> new SimpleGrantedAuthority(role.getName()))

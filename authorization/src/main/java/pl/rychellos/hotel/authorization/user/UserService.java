@@ -67,4 +67,9 @@ public class UserService extends GenericService<UserEntity, UserDTO, UserFilterD
 
         return optionalUserEntity.get();
     }
+
+    @Override
+    protected void fetchRelations(UserEntity entity, UserDTO dto) {
+        throw new RuntimeException("Not yet implemented");
+    }
 }

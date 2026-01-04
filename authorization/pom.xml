@@ -65,6 +65,13 @@
         </dependency>
         <!-- TESTS -->
         <dependency>
+            <groupId>pl.rychellos.hotel</groupId>
+            <artifactId>lib</artifactId>
+            <version>0.1-SNAPSHOT</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
