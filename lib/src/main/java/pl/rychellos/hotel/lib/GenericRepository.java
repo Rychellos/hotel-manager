@@ -10,7 +10,7 @@ import java.util.Collection;
 
 @NoRepositoryBean
 public interface GenericRepository<T> extends JpaRepository<T, Long> {
-    T getById(Long id);
+    T getReferenceById(Long id);
 
     Page<T> findAll(Specification<T> specification, Pageable pageable);
 

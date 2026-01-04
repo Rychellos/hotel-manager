@@ -15,18 +15,18 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.util.Collection;
 
-public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter> implements IGenericService<Entity, DTO, Filter> {
+public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>> implements IGenericService<Entity, DTO, Filter> {
     private final EntitySpecificationBuilder<Entity> specification = new EntitySpecificationBuilder<>();
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
 
     protected final LangUtil langUtil;
     protected final GenericMapper<Entity, DTO> mapper;
-    protected final GenericRepository<Entity> repository;
+    protected final Repository repository;
     protected final ApplicationExceptionFactory exceptionFactory;
 
     protected GenericService(
-        LangUtil langUtil, Class<DTO> clazz, GenericMapper<Entity, DTO> mapper, GenericRepository<Entity> repository,
+        LangUtil langUtil, Class<DTO> clazz, GenericMapper<Entity, DTO> mapper, Repository repository,
         ApplicationExceptionFactory exceptionFactory, ObjectMapper objectMapper
     ) {
         this.langUtil = langUtil;
@@ -36,6 +36,8 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         this.clazz = clazz;
         this.objectMapper = objectMapper;
     }
+
+    protected abstract void fetchRelations(Entity entity, DTO dto);
 
     protected Specification<Entity> createSpecification(Filter currencyDTOFilter) {
         return specification.build(currencyDTOFilter);
@@ -63,15 +65,15 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     }
 
     public DTO save(DTO dto) {
-        var e = mapper.toEntity(dto);
-        var e2 = repository.save(e);
-        var dto_2 = mapper.toDTO(e2);
+        Entity entity = mapper.toEntity(dto);
 
-        return dto_2;
+        fetchRelations(entity, dto);
+
+        return mapper.toDTO(repository.save(entity));
     }
 
     public DTO saveIfNotExists(DTO dto) throws ApplicationException {
-        if (repository.existsById(dto.getId())) {
+        if (exists(dto.getId())) {
             throw exceptionFactory.conflict(langUtil.getMessage("error.generic.alreadyExists.message"));
         }
 
@@ -88,15 +90,17 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
 
         mapper.updateEntityFromDTO(entity, dto);
 
+        fetchRelations(entity, dto);
+
         return mapper.toDTO(repository.save(entity));
     }
 
     public DTO patch(long id, JsonPatch patch) throws ApplicationException {
-        DTO user = getById(id);
+        DTO dto = getById(id);
 
         JsonNode patched;
         try {
-            patched = patch.apply(objectMapper.convertValue(user, JsonNode.class));
+            patched = patch.apply(objectMapper.convertValue(dto, JsonNode.class));
         } catch (JsonPatchException e) {
             throw exceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
         }

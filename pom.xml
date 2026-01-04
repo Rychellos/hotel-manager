@@ -207,7 +207,8 @@
                     <version>0.8.14</version>
                     <configuration>
                         <excludes>
-                            <exclude>pl/rychellos/hotel/**/*dto.</exclude>
+                            <exclude>**/*DTO*</exclude>
+                            <exclude>**/dto/*</exclude>
                             <exclude>**/configuration/*</exclude>
                         </excludes>
                     </configuration>

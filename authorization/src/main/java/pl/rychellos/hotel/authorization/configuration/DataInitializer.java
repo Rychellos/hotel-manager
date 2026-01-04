@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.permission.PermissionRepository;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
@@ -17,16 +21,18 @@ import pl.rychellos.hotel.lib.security.PermissionRegistry;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataInitializer implements CommandLineRunner {
+public class DataInitializer implements CommandLineRunner, ApplicationListener<ContextRefreshedEvent> {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
     private final List<PermissionRegistry> permissionRegistries;
+    private final RequestMappingHandlerMapping handlerMapping;
 
     @Override
     public void run(String @NonNull ... args) {
@@ -35,9 +41,12 @@ public class DataInitializer implements CommandLineRunner {
         // Ensure ROLE_ADMIN exists
         RoleEntity adminRole = roleRepository.findByName("ROLE_ADMIN")
             .orElseGet(() -> {
+                log.info("Creating admin role...");
+
                 RoleEntity role = new RoleEntity();
                 role.setName("ROLE_ADMIN");
                 role.setDescription("Administrator role");
+
                 return roleRepository.save(role);
             });
 
@@ -61,16 +70,53 @@ public class DataInitializer implements CommandLineRunner {
         roleRepository.save(adminRole);
 
         if (userRepository.count() == 0) {
-            log.info("Seeding initial admin user...");
-            UserEntity admin = UserEntity.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("password"))
-                .email("admin@hotel.com")
-                .roles(new HashSet<>(Set.of(adminRole)))
-                .build();
+            log.info("Creating admin user...");
+
+            //TODO: install script
+            String adminUsername = "admin";
+            String rawPassword = UUID.randomUUID().toString();
+
+            UserEntity admin = new UserEntity(
+                null,
+                adminUsername,
+                passwordEncoder.encode(rawPassword),
+                "admin@hotel.com",
+                new HashSet<>(Set.of(adminRole))
+            );
+
+            log.warn("Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}", adminUsername, rawPassword);
 
             userRepository.save(admin);
+
             log.info("Admin user seeded successfully.");
+        } else {
+            log.info("Seeding not necessary, users present in the database");
+        }
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        handlerMapping.getHandlerMethods().forEach((mapping, handlerMethod) -> {
+            CheckPermission annotation = handlerMethod.getMethodAnnotation(CheckPermission.class);
+
+            if (annotation != null) {
+                savePermissionIfMissing(annotation);
+            }
+        });
+    }
+
+    private void savePermissionIfMissing(CheckPermission annotation) {
+        log.info("Creating missing permission {}:{}:{}", annotation.target(), annotation.action().name(), annotation.scope().name());
+
+        String name = String.format("%s_%s_%s",
+            annotation.target(),
+            annotation.action(),
+            annotation.scope());
+
+        if (!permissionRepository.existsByName(name)) {
+            PermissionEntity entity = new PermissionEntity();
+            entity.setName(name);
+            permissionRepository.save(entity);
         }
     }
 }

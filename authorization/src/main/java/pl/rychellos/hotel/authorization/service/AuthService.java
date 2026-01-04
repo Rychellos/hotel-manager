@@ -5,9 +5,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
-import pl.rychellos.hotel.authorization.service.dto.AuthRequest;
-import pl.rychellos.hotel.authorization.service.dto.AuthResponse;
-import pl.rychellos.hotel.authorization.service.dto.AuthResult;
+import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResponseDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
 import pl.rychellos.hotel.authorization.token.RefreshTokenEntity;
 import pl.rychellos.hotel.authorization.token.RefreshTokenService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
@@ -25,9 +25,13 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final ApplicationExceptionFactory exceptionFactory;
 
-    public AuthService(UserRepository userRepository, JwtService jwtService,
-                       AuthenticationManager authenticationManager, RefreshTokenService refreshTokenService,
-                       ApplicationExceptionFactory exceptionFactory) {
+    public AuthService(
+        UserRepository userRepository,
+        JwtService jwtService,
+        AuthenticationManager authenticationManager,
+        RefreshTokenService refreshTokenService,
+        ApplicationExceptionFactory exceptionFactory
+    ) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -35,9 +39,10 @@ public class AuthService {
         this.exceptionFactory = exceptionFactory;
     }
 
-    public AuthResult authenticate(AuthRequest request) {
+    public AuthResultDTO authenticate(AuthRequestDTO request) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.username(), request.password()));
+            new UsernamePasswordAuthenticationToken(request.username(), request.password())
+        );
 
         UserEntity user = userRepository.findByUsername(request.username())
             .orElseThrow(() -> exceptionFactory.resourceNotFound("User not found"));
@@ -45,12 +50,12 @@ public class AuthService {
         String jwtToken = jwtService.generateToken(user);
         RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user);
 
-        AuthResponse authResponse = buildAuthResponse(user, jwtToken);
+        AuthResponseDTO authResponseDTO = buildAuthResponse(user, jwtToken);
 
-        return new AuthResult(authResponse, refreshToken.getTokenHash());
+        return new AuthResultDTO(authResponseDTO, refreshToken.getTokenHash());
     }
 
-    private AuthResponse buildAuthResponse(UserEntity user, String jwtToken) {
+    private AuthResponseDTO buildAuthResponse(UserEntity user, String jwtToken) {
         Set<String> roles = user.getRoles().stream()
             .map(RoleEntity::getName)
             .collect(Collectors.toSet());
@@ -60,14 +65,10 @@ public class AuthService {
             .map(PermissionEntity::getName)
             .collect(Collectors.toSet());
 
-        return AuthResponse.builder()
-            .accessToken(jwtToken)
-            .roles(roles)
-            .permissions(permissions)
-            .build();
+        return new AuthResponseDTO(jwtToken, roles, permissions);
     }
 
-    public AuthResult refreshToken(String token) {
+    public AuthResultDTO refreshToken(String token) {
         RefreshTokenEntity refreshTokenEntity = refreshTokenService.findByToken(token);
         refreshTokenService.verifyExpiration(refreshTokenEntity);
 
@@ -78,14 +79,13 @@ public class AuthService {
         UserEntity user = refreshTokenEntity.getUser();
         String accessToken = jwtService.generateToken(user);
 
-        AuthResponse authResponse = buildAuthResponse(user, accessToken);
+        AuthResponseDTO authResponseDTO = buildAuthResponse(user, accessToken);
 
 
-        return new AuthResult(authResponse, token);
+        return new AuthResultDTO(authResponseDTO, token);
     }
 
     public void logout(String refreshToken) {
         refreshTokenService.revokeToken(refreshToken);
     }
-
 }

@@ -94,15 +94,13 @@ public class JwtService {
                     langUtil.getMessage("error.token.access.malformed")
                 );
             }
-
-            throw exception;
         } catch (Exception exception) {
             log.error("Unhandled exception type: {}\nToken: {}", exception.getClass().getSimpleName(), token, exception);
-
-            throw applicationExceptionFactory.forbidden(
-                langUtil.getMessage("error.token.unknown")
-            );
         }
+        
+        throw applicationExceptionFactory.forbidden(
+            langUtil.getMessage("error.token.unknown")
+        );
     }
 
     private SecretKey getSignInKey() {
