@@ -11,6 +11,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import pl.rychellos.hotel.authorization.JwtAuthenticationFilter;
 import pl.rychellos.hotel.authorization.service.JwtService;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @Configuration
 class SecurityFilterChainConfiguration {
@@ -26,7 +28,7 @@ class SecurityFilterChainConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerExceptionResolver handlerExceptionResolver, ApplicationExceptionFactory applicationExceptionFactory, LangUtil langUtil) throws Exception {
         http
             .securityMatcher("/api/v1/**")
             .csrf(AbstractHttpConfigurer::disable)
@@ -39,7 +41,7 @@ class SecurityFilterChainConfiguration {
                 .anyRequest()
                 .authenticated()
             )
-            .addFilterBefore(new JwtAuthenticationFilter(jwtService, userDetailsService, handlerExceptionResolver), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtAuthenticationFilter(jwtService, userDetailsService, handlerExceptionResolver, applicationExceptionFactory, langUtil), UsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable);
 

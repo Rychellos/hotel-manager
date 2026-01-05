@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 
+import java.util.Arrays;
+
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,7 +23,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ApplicationException.class)
     public ProblemDetail handleApplicationException(ApplicationException exception) {
         log.error("{}: {}", exception.getTitle(), exception.getMessage());
-        
+
         return exception.getProblemDetail();
     }
 
@@ -37,5 +39,12 @@ public class GlobalExceptionHandler {
         log.error("Authentication failed: {}", exception.getMessage());
 
         return applicationExceptionFactory.unauthorized(exception.getMessage()).getProblemDetail();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleException(Exception exception) {
+        log.error(Arrays.toString(exception.getStackTrace()));
+
+        return applicationExceptionFactory.internalServerError(exception.getMessage()).getProblemDetail();
     }
 }
