@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,11 +45,19 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     }
 
     public Page<DTO> getAllPaginated(Pageable pageable, Filter filter) {
-        return repository.findAll(createSpecification(filter), pageable).map(mapper::toDTO);
+        try {
+            return repository.findAll(createSpecification(filter), pageable).map(mapper::toDTO);
+        } catch (InvalidDataAccessApiUsageException exception) {
+            throw exceptionFactory.badRequest("Malformed api request");
+        }
     }
 
     public Collection<DTO> getAll(Filter filter) {
-        return repository.findAll(createSpecification(filter)).stream().map(mapper::toDTO).toList();
+        try {
+            return repository.findAll(createSpecification(filter)).stream().map(mapper::toDTO).toList();
+        } catch (InvalidDataAccessApiUsageException exception) {
+            throw exceptionFactory.badRequest("Malformed api request");
+        }
     }
 
     public DTO getById(long id) throws ApplicationException {

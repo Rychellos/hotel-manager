@@ -55,6 +55,10 @@ public class LangConfig implements WebMvcConfigurer {
         PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
         Resource[] resources = resolver.getResources("classpath*:messages-*");
+        log.info("Found {} messages files", resources.length);
+        for (Resource resource : resources) {
+            log.info(" - {}", resource.getFilename().substring(0, resource.getFilename().lastIndexOf(".")));
+        }
 
         Set<String> baseNames = getBaseNames(resources);
 

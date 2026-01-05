@@ -52,7 +52,7 @@ public class AuthService {
 
         AuthResponseDTO authResponseDTO = buildAuthResponse(user, jwtToken);
 
-        return new AuthResultDTO(authResponseDTO, refreshToken.getTokenHash());
+        return new AuthResultDTO(authResponseDTO, refreshToken.getTokenHash(), user.getUsername());
     }
 
     private AuthResponseDTO buildAuthResponse(UserEntity user, String jwtToken) {
@@ -82,7 +82,7 @@ public class AuthService {
         AuthResponseDTO authResponseDTO = buildAuthResponse(user, accessToken);
 
 
-        return new AuthResultDTO(authResponseDTO, token);
+        return new AuthResultDTO(authResponseDTO, token, user.getUsername());
     }
 
     public void logout(String refreshToken) {

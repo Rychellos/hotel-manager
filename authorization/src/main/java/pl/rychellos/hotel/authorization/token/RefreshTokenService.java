@@ -46,7 +46,7 @@ public class RefreshTokenService {
     public void save(RefreshTokenEntity token) {
         refreshTokenRepository.save(token);
     }
-
+    
     public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) throws ApplicationException {
         if (token.isExpired()) {
             refreshTokenRepository.delete(token);

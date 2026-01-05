@@ -49,8 +49,11 @@ public class UserEntity implements UserDetails, BaseEntity {
 
         authorities.addAll(roles.stream()
             .flatMap(role -> role.getPermissions().stream())
-            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-            .collect(Collectors.toSet()));
+            .map(permission -> new SimpleGrantedAuthority(
+                permission.getName()
+            ))
+            .collect(Collectors.toSet())
+        );
 
         return authorities;
     }

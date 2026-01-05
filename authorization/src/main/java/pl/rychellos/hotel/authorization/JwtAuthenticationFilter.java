@@ -15,17 +15,23 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import pl.rychellos.hotel.authorization.service.JwtService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final ApplicationExceptionFactory applicationExceptionFactory;
+    private final LangUtil langUtil;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver handlerExceptionResolver) {
+    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver handlerExceptionResolver, ApplicationExceptionFactory applicationExceptionFactory, LangUtil langUtil) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.applicationExceptionFactory = applicationExceptionFactory;
+        this.langUtil = langUtil;
     }
 
     private void processToken(HttpServletRequest request) throws ApplicationException {
@@ -36,7 +42,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.info("Invalid data provided as token");
-            return;
+
+            throw applicationExceptionFactory.badRequest(
+                langUtil.getMessage("error.token.access.malformed")
+            );
         }
 
         jwt = authHeader.substring(7);
@@ -65,6 +74,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
                 log.info("Couldn't validate token validated successfully");
+
+                throw applicationExceptionFactory.badRequest(
+                    langUtil.getMessage("error.token.access.malformed")
+                );
             }
         } else if (userEmail == null) {
             log.info("User email is null");

@@ -84,20 +84,20 @@ public class JwtService {
                 .getPayload();
         } catch (JwtException exception) {
             if (exception instanceof ExpiredJwtException) {
-                throw applicationExceptionFactory.forbidden(
+                throw applicationExceptionFactory.unauthorized(
                     langUtil.getMessage("error.token.access.expired")
                 );
             }
 
             if (exception instanceof UnsupportedJwtException) {
-                throw applicationExceptionFactory.forbidden(
+                throw applicationExceptionFactory.unauthorized(
                     langUtil.getMessage("error.token.access.malformed")
                 );
             }
         } catch (Exception exception) {
             log.error("Unhandled exception type: {}\nToken: {}", exception.getClass().getSimpleName(), token, exception);
         }
-        
+
         throw applicationExceptionFactory.forbidden(
             langUtil.getMessage("error.token.unknown")
         );

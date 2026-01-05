@@ -14,65 +14,65 @@ public class ApplicationExceptionFactory {
 
     public ApplicationException badRequest(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.badRequest.title"),
-                detail,
-                HttpStatus.BAD_REQUEST
+            langUtil.getMessage("error.generic.badRequest.title"),
+            detail,
+            HttpStatus.BAD_REQUEST
         );
     }
 
     public ApplicationException unauthorized(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.unauthorized.title"),
-                detail,
-                HttpStatus.UNAUTHORIZED
+            langUtil.getMessage("error.generic.unauthorized.title"),
+            detail,
+            HttpStatus.UNAUTHORIZED
         );
     }
 
     public ApplicationException forbidden(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.forbidden.title"),
-                detail,
-                HttpStatus.FORBIDDEN
+            langUtil.getMessage("error.generic.forbidden.title"),
+            detail,
+            HttpStatus.FORBIDDEN
         );
     }
 
     public ApplicationException resourceNotFound(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.notFound.title"),
-                detail,
-                HttpStatus.NOT_FOUND
+            langUtil.getMessage("error.generic.notFound.title"),
+            detail,
+            HttpStatus.NOT_FOUND
         );
     }
 
     public ApplicationException methodNotAllowed(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.methodNotAllowed.title"),
-                detail,
-                HttpStatus.METHOD_NOT_ALLOWED
+            langUtil.getMessage("error.generic.methodNotAllowed.title"),
+            detail,
+            HttpStatus.METHOD_NOT_ALLOWED
         );
     }
 
     public ApplicationException conflict(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.generic.conflict.title"),
-                detail,
-                HttpStatus.CONFLICT
+            langUtil.getMessage("error.generic.conflict.title"),
+            detail,
+            HttpStatus.CONFLICT
         );
     }
 
     public ApplicationException internalServerError(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.internalServerError"),
-                detail,
-                HttpStatus.INTERNAL_SERVER_ERROR
+            langUtil.getMessage("error.generic.internalServerError.title"),
+            detail,
+            HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
 
     public ApplicationException invalidPatchError(String detail) {
         return new ApplicationException(
-                langUtil.getMessage("error.invalidPatchError"),
-                detail,
-                HttpStatus.BAD_REQUEST
+            langUtil.getMessage("error.generic.invalidPatch.title"),
+            detail,
+            HttpStatus.BAD_REQUEST
         );
     }
 }

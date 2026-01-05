@@ -17,6 +17,8 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import pl.rychellos.hotel.authorization.service.JwtService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,6 +38,10 @@ class JwtAuthenticationFilterTest {
     private HttpServletRequest request;
     @Mock
     private HttpServletResponse response;
+    @Mock
+    private LangUtil langUtil;
+    @Mock
+    private ApplicationExceptionFactory applicationExceptionFactory;
 
     @InjectMocks
     private JwtAuthenticationFilter filter;
@@ -76,14 +82,19 @@ class JwtAuthenticationFilterTest {
     void doFilterInternal_ShouldSkip_WhenNoAuthHeaderPresent() throws Exception {
         /// Given
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(null);
+        ApplicationException ex = mock(ApplicationException.class);
+        when(langUtil.getMessage(anyString())).thenReturn("");
+        when(applicationExceptionFactory.badRequest(anyString())).thenReturn(ex);
 
         /// When
         filter.doFilterInternal(request, response, filterChain);
 
         /// Then
         assertNull(SecurityContextHolder.getContext().getAuthentication());
-        verify(filterChain).doFilter(request, response);
+        verify(handlerExceptionResolver).resolveException(eq(request), eq(response), isNull(), eq(ex));
         verifyNoInteractions(jwtService);
+        verify(langUtil).getMessage(anyString());
+        verify(applicationExceptionFactory).badRequest(anyString());
     }
 
     @Test
