@@ -1,5 +1,8 @@
 package pl.rychellos.hotel.webapi;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -14,11 +17,11 @@ import pl.rychellos.hotel.webapi.configuration.SwaggerConfiguration;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
-@Tag(name = "Authorization", description = "Endpoints for user authorization")
-public class AuthorizationController {
+@Tag(name = "Authentication", description = "Endpoints for user authentication")
+public class AuthenticationController {
     private final AuthService authService;
 
-    public AuthorizationController(AuthService authService) {
+    public AuthenticationController(AuthService authService) {
         this.authService = authService;
     }
 
@@ -27,6 +30,15 @@ public class AuthorizationController {
         HttpStatus.UNAUTHORIZED,
         HttpStatus.INTERNAL_SERVER_ERROR
     })
+    @Operation(
+        summary = "Used for user login using username and password.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = {
+                @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
+                @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
+            }
+        )
+    )
     public ResponseEntity<AuthResponseDTO> loginJson(
         @RequestBody AuthRequestDTO request
     ) throws ApplicationException {
@@ -38,6 +50,15 @@ public class AuthorizationController {
         HttpStatus.UNAUTHORIZED,
         HttpStatus.INTERNAL_SERVER_ERROR
     })
+    @Operation(
+        summary = "Used for user login using username and password.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            content = {
+                @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
+                @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
+            }
+        )
+    )
     public ResponseEntity<AuthResponseDTO> loginForm(
         @ModelAttribute AuthRequestDTO request
     ) throws ApplicationException {
@@ -58,7 +79,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/refresh")
-    @Tag(name = "", description = "Refreshes token located inside cookie and returns new access token.")
+    @Operation(summary = "Refreshes token located inside cookie and returns new login response.")
     public ResponseEntity<AuthResponseDTO> refresh(
         @CookieValue(name = "refresh_token") String refreshToken
     ) {
@@ -73,6 +94,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Deletes token located inside cookie and revokes it in database.")
     public ResponseEntity<Void> logout(
         @CookieValue(name = "refresh_token") String refreshToken
     ) {
