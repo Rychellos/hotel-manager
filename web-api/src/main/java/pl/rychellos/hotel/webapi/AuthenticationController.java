@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.service.AuthService;
 import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResponseDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResponseOAuth2DTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.webapi.configuration.SwaggerConfiguration;
@@ -42,7 +43,14 @@ public class AuthenticationController {
     public ResponseEntity<AuthResponseDTO> loginJson(
         @RequestBody AuthRequestDTO request
     ) throws ApplicationException {
-        return processLogin(request);
+        log.info("Login attempt using \"application/json\" for user with username {}", request.username());
+
+        AuthResultDTO result = authService.authenticate(request);
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .body(result.authResponseDTO());
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -59,23 +67,21 @@ public class AuthenticationController {
             }
         )
     )
-    public ResponseEntity<AuthResponseDTO> loginForm(
+    public ResponseEntity<AuthResponseOAuth2DTO> loginForm(
         @ModelAttribute AuthRequestDTO request
     ) throws ApplicationException {
-        return processLogin(request);
-    }
-
-    private ResponseEntity<AuthResponseDTO> processLogin(
-        AuthRequestDTO request
-    ) throws ApplicationException {
-        log.info("Login attempt for user with username {}", request.username());
+        log.info("Login attempt using \"application/x-www-form-urlencoded\" for user with username {}", request.username());
 
         AuthResultDTO result = authService.authenticate(request);
         ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
 
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .body(result.authResponseDTO());
+            .body(new AuthResponseOAuth2DTO(
+                result.authResponseDTO().accessToken(),
+                result.refreshToken(),
+                "Bearer"
+            ));
     }
 
     @PostMapping("/refresh")

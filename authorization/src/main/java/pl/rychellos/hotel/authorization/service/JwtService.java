@@ -1,6 +1,9 @@
 package pl.rychellos.hotel.authorization.service;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +85,7 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-        } catch (JwtException exception) {
+        } catch (Exception exception) {
             if (exception instanceof ExpiredJwtException) {
                 throw applicationExceptionFactory.unauthorized(
                     langUtil.getMessage("error.token.access.expired")
@@ -94,7 +97,7 @@ public class JwtService {
                     langUtil.getMessage("error.token.access.malformed")
                 );
             }
-        } catch (Exception exception) {
+
             log.error("Unhandled exception type: {}\nToken: {}", exception.getClass().getSimpleName(), token, exception);
         }
 

@@ -120,7 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handlerExceptionResolver.resolveException(request, response, null, applicationException);
             }
         } catch (Exception exception) {
-            log.info("Failed to process a token", exception);
+            log.info("Failed to process a token.", exception);
 
             if (!response.isCommitted()) {
                 handlerExceptionResolver.resolveException(request, response, null, exception);
