@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CurrencyDTOFilter {
+public class CurrencyFilterDTO {
     private String currency;
     private String code;
 

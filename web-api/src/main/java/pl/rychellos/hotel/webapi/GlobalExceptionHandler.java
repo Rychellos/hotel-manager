@@ -41,6 +41,12 @@ public class GlobalExceptionHandler {
         return applicationExceptionFactory.unauthorized(exception.getMessage()).getProblemDetail();
     }
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public org.springframework.http.ResponseEntity<Void> handleNoResourceFoundException(
+            org.springframework.web.servlet.resource.NoResourceFoundException exception) {
+        return org.springframework.http.ResponseEntity.notFound().build();
+    }
+
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleException(Exception exception) {
         log.error(Arrays.toString(exception.getStackTrace()));

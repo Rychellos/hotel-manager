@@ -1,14 +1,11 @@
 package pl.rychellos.hotel.currencyexchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
 import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
-import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTOFilter;
-import pl.rychellos.hotel.lib.GenericMapper;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyFilterDTO;
 import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
@@ -18,25 +15,24 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
-public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyDTOFilter, CurrencyRepository> implements ICurrencyService {
+public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyFilterDTO, CurrencyRepository> implements ICurrencyService {
     protected CurrencyRepository repository;
     protected ICurrencyClient currencyClient;
 
     protected CurrencyService(
         LangUtil langUtil,
-        Class<CurrencyDTO> clazz,
-        GenericMapper<CurrencyEntity, CurrencyDTO> mapper,
+        CurrencyMapper mapper,
         CurrencyRepository repository,
         ApplicationExceptionFactory exceptionFactory,
         ObjectMapper objectMapper,
         ICurrencyClient currencyClient
     ) {
-        super(langUtil, clazz, mapper, repository, exceptionFactory, objectMapper);
+        super(langUtil, CurrencyDTO.class, mapper, repository, exceptionFactory, objectMapper);
         this.repository = repository;
         this.currencyClient = currencyClient;
     }
 
-    @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    //    @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
     public CurrencyDTO get(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
         Optional<CurrencyEntity> dbValue = repository.findByCodeAndEffectiveDate(currencyCode, effectiveDate);
 
@@ -64,7 +60,7 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
         return save(currencyDTO);
     }
 
-    @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    //    @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
     public void delete(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
         super.delete(get(currencyCode, effectiveDate).getId());
     }

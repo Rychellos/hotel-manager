@@ -19,14 +19,14 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class UserService extends GenericService<UserEntity, UserDTO, UserFilterDTO, UserRepository> implements UserDetailsPasswordService, UserDetailsService {
+public class UserService extends GenericService<UserEntity, UserDTO, UserFilterDTO, UserRepository>
+        implements UserDetailsPasswordService, UserDetailsService {
     public UserService(
-        UserRepository repository,
-        UserMapper mapper,
-        ApplicationExceptionFactory exceptionFactory,
-        LangUtil langUtil,
-        ObjectMapper objectMapper
-    ) {
+            UserRepository repository,
+            UserMapper mapper,
+            ApplicationExceptionFactory exceptionFactory,
+            LangUtil langUtil,
+            ObjectMapper objectMapper) {
         super(langUtil, UserDTO.class, mapper, repository, exceptionFactory, objectMapper);
     }
 
@@ -35,11 +35,11 @@ public class UserService extends GenericService<UserEntity, UserDTO, UserFilterD
         Optional<UserEntity> optionalUserEntity = this.repository.findByUsername(user.getUsername());
 
         if (optionalUserEntity.isEmpty()) {
-            log.info("Tried to change password of user with username {}, but user with this username doesn't exist", user.getUsername());
+            log.info("Tried to change password of user with username {}, but user with this username doesn't exist",
+                    user.getUsername());
 
             throw exceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byUsername", user.getUsername())
-            );
+                    langUtil.getMessage("error.user.notFound.byUsername", user.getUsername()));
         }
 
         log.info("Changed {}'s password", user.getUsername());
@@ -53,14 +53,18 @@ public class UserService extends GenericService<UserEntity, UserDTO, UserFilterD
 
     @Override
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+        if (username == null || username.isBlank()) {
+            throw new UsernameNotFoundException(
+                    langUtil.getMessage("error.user.username.empty"));
+        }
+
         Optional<UserEntity> optionalUserEntity = this.repository.findByUsername(username);
 
         if (optionalUserEntity.isEmpty()) {
             log.error("Tried to load user with username {}, but user with this username doesn't exist", username);
 
-            throw exceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byUsername", username)
-            );
+            throw new UsernameNotFoundException(
+                    langUtil.getMessage("error.user.notFound.byUsername", username));
         }
 
         log.info("Loaded user with username {}", username);

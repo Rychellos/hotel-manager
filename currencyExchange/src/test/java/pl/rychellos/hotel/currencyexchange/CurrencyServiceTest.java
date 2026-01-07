@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
 import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
-import pl.rychellos.hotel.lib.GenericMapper;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
@@ -33,7 +32,7 @@ class CurrencyServiceTest {
     private LangUtil langUtil;
 
     @Mock
-    private GenericMapper<CurrencyEntity, CurrencyDTO> mapper;
+    private CurrencyMapper mapper;
 
     @Mock
     private CurrencyRepository repository;
@@ -59,7 +58,6 @@ class CurrencyServiceTest {
     void setUp() {
         currencyService = new CurrencyService(
             langUtil,
-            CurrencyDTO.class,
             mapper,
             repository,
             exceptionFactory,

@@ -1,12 +1,8 @@
 package pl.rychellos.hotel.webapi;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.service.AuthService;
 import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
@@ -26,65 +22,65 @@ public class AuthorizationController {
         this.authService = authService;
     }
 
-    @PostMapping(
-        value = "/login",
-        consumes = {
-            MediaType.APPLICATION_JSON_VALUE,
-            MediaType.APPLICATION_FORM_URLENCODED_VALUE
-        }
-    )
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SwaggerConfiguration.ApiProblemResponses(value = {
         HttpStatus.UNAUTHORIZED,
         HttpStatus.INTERNAL_SERVER_ERROR
     })
-    public ResponseEntity<AuthResponseDTO> login(
-        @ModelAttribute @RequestBody(required = false) AuthRequestDTO request,
-        HttpServletResponse response
+    public ResponseEntity<AuthResponseDTO> loginJson(
+        @RequestBody AuthRequestDTO request
+    ) throws ApplicationException {
+        return processLogin(request);
+    }
+
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @SwaggerConfiguration.ApiProblemResponses(value = {
+        HttpStatus.UNAUTHORIZED,
+        HttpStatus.INTERNAL_SERVER_ERROR
+    })
+    public ResponseEntity<AuthResponseDTO> loginForm(
+        @ModelAttribute AuthRequestDTO request
+    ) throws ApplicationException {
+        return processLogin(request);
+    }
+
+    private ResponseEntity<AuthResponseDTO> processLogin(
+        AuthRequestDTO request
     ) throws ApplicationException {
         log.info("Login attempt for user with username {}", request.username());
 
         AuthResultDTO result = authService.authenticate(request);
-        setRefreshTokenCookie(response, result.refreshToken());
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
 
-        return ResponseEntity.ok(result.authResponseDTO());
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .body(result.authResponseDTO());
     }
 
     @PostMapping("/refresh")
+    @Tag(name = "", description = "Refreshes token located inside cookie and returns new access token.")
     public ResponseEntity<AuthResponseDTO> refresh(
-        @CookieValue(name = "refresh_token") String refreshToken,
-        HttpServletResponse response
+        @CookieValue(name = "refresh_token") String refreshToken
     ) {
         AuthResultDTO result = authService.refreshToken(refreshToken);
-        setRefreshTokenCookie(response, result.refreshToken());
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
 
         log.info("User with username {} refreshed token", result.username());
 
-        return ResponseEntity.ok(result.authResponseDTO());
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .body(result.authResponseDTO());
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CookieValue(name = "refresh_token") String refreshToken,
-                                       HttpServletResponse response) {
+    public ResponseEntity<Void> logout(
+        @CookieValue(name = "refresh_token") String refreshToken
+    ) {
         authService.logout(refreshToken);
-        deleteRefreshTokenCookie(response);
-        return ResponseEntity.noContent().build();
-    }
+        ResponseCookie cookie = authService.createLogoutCookie();
 
-    private void setRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie cookie = new Cookie("refresh_token", refreshToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // Set to true in production
-        cookie.setPath("/");
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
-        response.addCookie(cookie);
-    }
-
-    private void deleteRefreshTokenCookie(HttpServletResponse response) {
-        Cookie cookie = new Cookie("refresh_token", null);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        return ResponseEntity.noContent()
+            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .build();
     }
 }

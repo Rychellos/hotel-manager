@@ -19,11 +19,15 @@ public class RefreshTokenService {
     private Long refreshTokenDurationMs;
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final ApplicationExceptionFactory exceptionFactory;
+    private final ApplicationExceptionFactory applicationExceptionFactory;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, ApplicationExceptionFactory exceptionFactory, LangUtil langUtil) {
+    public RefreshTokenService(
+        RefreshTokenRepository refreshTokenRepository,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.exceptionFactory = exceptionFactory;
+        this.applicationExceptionFactory = applicationExceptionFactory;
         this.langUtil = langUtil;
     }
 
@@ -37,7 +41,7 @@ public class RefreshTokenService {
         try {
             return refreshTokenRepository.save(refreshToken);
         } catch (Exception e) {
-            throw exceptionFactory.internalServerError(
+            throw applicationExceptionFactory.internalServerError(
                 langUtil.getMessage("error.token.refresh.creation")
             );
         }
@@ -46,12 +50,14 @@ public class RefreshTokenService {
     public void save(RefreshTokenEntity token) {
         refreshTokenRepository.save(token);
     }
-    
-    public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) throws ApplicationException {
+
+    public RefreshTokenEntity verifyExpiration(
+        RefreshTokenEntity token
+    ) throws ApplicationException {
         if (token.isExpired()) {
             refreshTokenRepository.delete(token);
 
-            throw exceptionFactory.forbidden(
+            throw applicationExceptionFactory.forbidden(
                 langUtil.getMessage("error.token.refresh.expired")
             );
         }
@@ -81,6 +87,6 @@ public class RefreshTokenService {
 
     public RefreshTokenEntity findByToken(String token) {
         return refreshTokenRepository.findByTokenHash(token)
-            .orElseThrow(() -> exceptionFactory.resourceNotFound("Refresh token is not in database!"));
+            .orElseThrow(() -> applicationExceptionFactory.resourceNotFound("Refresh token is not in database!"));
     }
 }

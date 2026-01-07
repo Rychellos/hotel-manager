@@ -26,7 +26,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final ApplicationExceptionFactory applicationExceptionFactory;
     private final LangUtil langUtil;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver handlerExceptionResolver, ApplicationExceptionFactory applicationExceptionFactory, LangUtil langUtil) {
+    public JwtAuthenticationFilter(
+        JwtService jwtService,
+        UserDetailsService userDetailsService,
+        HandlerExceptionResolver handlerExceptionResolver,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
@@ -38,25 +44,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         log.info("Started processing access token");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String jwt;
-        String userEmail;
+        String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.info("Invalid data provided as token");
 
-            throw applicationExceptionFactory.badRequest(
-                langUtil.getMessage("error.token.access.malformed")
+            throw applicationExceptionFactory.unauthorized(
+                langUtil.getMessage("error.token.access.missing")
             );
         }
 
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);
+        username = jwtService.extractUsername(jwt);
 
         if (
-            userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null
+            username != null && SecurityContextHolder.getContext().getAuthentication() == null
         ) {
             log.info("Began authenticating user");
+            UserEntity userDetails;
 
-            UserEntity userDetails = (UserEntity) this.userDetailsService.loadUserByUsername(userEmail);
+            userDetails = (UserEntity) this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 log.info("Provided token is valid");
@@ -79,7 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     langUtil.getMessage("error.token.access.malformed")
                 );
             }
-        } else if (userEmail == null) {
+        } else if (username == null) {
             log.info("User email is null");
         } else {
             log.info("User already authenticated");

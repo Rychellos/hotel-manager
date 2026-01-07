@@ -84,7 +84,8 @@ class JwtAuthenticationFilterTest {
         when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(null);
         ApplicationException ex = mock(ApplicationException.class);
         when(langUtil.getMessage(anyString())).thenReturn("");
-        when(applicationExceptionFactory.badRequest(anyString())).thenReturn(ex);
+        // Add this missing stub
+        when(applicationExceptionFactory.unauthorized(anyString())).thenReturn(ex);
 
         /// When
         filter.doFilterInternal(request, response, filterChain);
@@ -94,7 +95,7 @@ class JwtAuthenticationFilterTest {
         verify(handlerExceptionResolver).resolveException(eq(request), eq(response), isNull(), eq(ex));
         verifyNoInteractions(jwtService);
         verify(langUtil).getMessage(anyString());
-        verify(applicationExceptionFactory).badRequest(anyString());
+        verify(applicationExceptionFactory).unauthorized(anyString());
     }
 
     @Test

@@ -1,5 +1,6 @@
 package pl.rychellos.hotel.authorization.service;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 
+import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +43,10 @@ public class AuthService {
 
     public AuthResultDTO authenticate(AuthRequestDTO request) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.username(), request.password())
+            new UsernamePasswordAuthenticationToken(
+                request.username(),
+                request.password()
+            )
         );
 
         UserEntity user = userRepository.findByUsername(request.username())
@@ -81,11 +86,28 @@ public class AuthService {
 
         AuthResponseDTO authResponseDTO = buildAuthResponse(user, accessToken);
 
-
         return new AuthResultDTO(authResponseDTO, token, user.getUsername());
     }
 
     public void logout(String refreshToken) {
         refreshTokenService.revokeToken(refreshToken);
+    }
+
+    public ResponseCookie createRefreshTokenCookie(String refreshToken) {
+        return ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(Duration.ofDays(7))
+            .build();
+    }
+
+    public ResponseCookie createLogoutCookie() {
+        return ResponseCookie.from("refresh_token", "")
+            .httpOnly(true)
+            .secure(false)
+            .path("/")
+            .maxAge(0)
+            .build();
     }
 }

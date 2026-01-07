@@ -28,7 +28,7 @@ public class RefreshTokenEntity {
     private boolean revoked;
 
     @Column(nullable = false)
-    private long accessTokenCount = 0;
+    private long accessTokenCount = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
