@@ -8,6 +8,7 @@ import pl.rychellos.hotel.lib.BaseEntity;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -21,6 +22,9 @@ public class PermissionEntity implements BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false, unique = true)
     private String name;

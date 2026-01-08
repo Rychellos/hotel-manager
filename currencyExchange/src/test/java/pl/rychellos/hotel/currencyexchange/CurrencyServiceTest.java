@@ -20,6 +20,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -69,10 +70,25 @@ class CurrencyServiceTest {
     @Test
     void get_shouldReturnCurrencyDTO_whenCurrencyExists() {
         /// Given
-        CurrencyEntity entity = new CurrencyEntity(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
-        CurrencyDTO expectedDTO = new CurrencyDTO(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
+        CurrencyEntity entity = new CurrencyEntity(
+            TEST_ID, UUID.randomUUID(),
+            "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
+        CurrencyDTO expectedDTO = new CurrencyDTO(
+            TEST_ID,
+            UUID.randomUUID(), "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
 
-        when(repository.findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, LocalDate.now())).thenReturn(Optional.of(entity));
+        when(repository.findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, LocalDate.now()))
+            .thenReturn(Optional.of(entity));
         when(mapper.toDTO(entity)).thenReturn(expectedDTO);
 
         /// When
@@ -91,15 +107,32 @@ class CurrencyServiceTest {
     @Test
     void get_shouldFetchFromAPIAndSave_whenCurrencyNotInDatabase() {
         /// Given
-        when(repository.findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, TEST_EFFECTIVE_DATE)).thenReturn(Optional.empty());
+        when(repository.findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, TEST_EFFECTIVE_DATE))
+            .thenReturn(Optional.empty());
 
         CurrencyRateDTO rate = new CurrencyRateDTO(TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
         ArrayList<CurrencyRateDTO> rates = new ArrayList<>();
         rates.add(rate);
         CurrencyFetchDTO fetch = new CurrencyFetchDTO("A", "dolar amerykański", TEST_CURRENCY_CODE, rates);
 
-        CurrencyEntity savedEntity = new CurrencyEntity(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
-        CurrencyDTO savedDTO = new CurrencyDTO(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
+        CurrencyEntity savedEntity = new CurrencyEntity(
+            TEST_ID,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
+        CurrencyDTO savedDTO = new CurrencyDTO(
+            TEST_ID,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
 
         when(currencyClient.getRate(TEST_CURRENCY_CODE)).thenReturn(fetch);
 
@@ -123,11 +156,28 @@ class CurrencyServiceTest {
     @Test
     void delete_shouldDeleteCurrency_whenCurrencyExists() {
         /// Given
-        CurrencyEntity entity = new CurrencyEntity(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
-        CurrencyDTO dto = new CurrencyDTO(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
+        CurrencyEntity entity = new CurrencyEntity(
+            TEST_ID,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
+        CurrencyDTO dto = new CurrencyDTO(
+            TEST_ID,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            TEST_CURRENCY_CODE,
+            TEST_NO,
+            TEST_EFFECTIVE_DATE,
+            TEST_MID
+        );
 
         /// When
-        when(repository.findByCodeAndEffectiveDate(eq(TEST_CURRENCY_CODE), any(LocalDate.class))).thenReturn(Optional.of(entity));
+        when(repository.findByCodeAndEffectiveDate(eq(TEST_CURRENCY_CODE), any(LocalDate.class)))
+            .thenReturn(Optional.of(entity));
         when(mapper.toDTO(entity)).thenReturn(dto);
         when(mapper.toEntity(dto)).thenReturn(entity);
         when(repository.existsById(TEST_ID)).thenReturn(true);
@@ -170,8 +220,24 @@ class CurrencyServiceTest {
         CurrencyRateDTO eurRate = new CurrencyRateDTO(eurNo, eurEffectiveDate, eurMid);
         CurrencyFetchDTO eurFetch = new CurrencyFetchDTO("A", "Euro", eurCode, new ArrayList<>(List.of(eurRate)));
 
-        CurrencyEntity eurEntity = new CurrencyEntity(2L, "Euro", eurCode, eurNo, eurEffectiveDate, eurMid);
-        CurrencyDTO eurDTO = new CurrencyDTO(2L, "Euro", eurCode, eurNo, eurEffectiveDate, eurMid);
+        CurrencyEntity eurEntity = new CurrencyEntity(
+            2L,
+            UUID.randomUUID(),
+            "Euro",
+            eurCode,
+            eurNo,
+            eurEffectiveDate,
+            eurMid
+        );
+        CurrencyDTO eurDTO = new CurrencyDTO(
+            2L,
+            UUID.randomUUID(),
+            "Euro",
+            eurCode,
+            eurNo,
+            eurEffectiveDate,
+            eurMid
+        );
 
         /// When
         when(repository.findByCodeAndEffectiveDate(eurCode, eurEffectiveDate)).thenReturn(Optional.empty());

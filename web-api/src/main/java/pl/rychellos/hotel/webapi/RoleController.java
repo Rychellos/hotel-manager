@@ -45,11 +45,11 @@ public class RoleController extends GenericController<
         return getPage(pageable, filter);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "ROLE", action = ActionType.READ, scope = ActionScope.ONE)
-    @Operation(summary = "Fetch details about single role")
-    public RoleDTO getById(@PathVariable long id) {
-        return getOne(id);
+    @Operation(summary = "Fetch details about single role by id or UUID")
+    public RoleDTO getById(@PathVariable String idOrUuid) {
+        return getOne(idOrUuid);
     }
 
     @PostMapping
@@ -59,34 +59,33 @@ public class RoleController extends GenericController<
         return ResponseEntity.ok(this.createOne(roleDTO));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idOrUuid}")
     @CheckPermission(target = "ROLE", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Sets role's details")
     public ResponseEntity<RoleDTO> put(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody RoleDTO roleDTO
     ) {
-        roleDTO.setId(id);
-        return ResponseEntity.ok(this.putOne(roleDTO));
+        return ResponseEntity.ok(this.putOne(idOrUuid, roleDTO));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{idOrUuid}")
     @CheckPermission(target = "ROLE", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Updates role's details")
     public ResponseEntity<RoleDTO> patch(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody JsonPatch roleDTO
     ) {
-        return ResponseEntity.ok(this.patchOne(id, roleDTO));
+        return ResponseEntity.ok(this.patchOne(idOrUuid, roleDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "ROLE", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Deletes role")
     public ResponseEntity<Void> delete(
-        @PathVariable Long id
+        @PathVariable String idOrUuid
     ) {
-        this.deleteOne(id);
+        this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }
 }

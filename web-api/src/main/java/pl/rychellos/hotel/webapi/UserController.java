@@ -59,13 +59,13 @@ public class UserController extends GenericController<
         return super.getPage(pageable, filter);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
-    @Operation(summary = "Fetch details about single user")
-    public ResponseEntity<UserDTO> getById(@PathVariable long id) {
+    @Operation(summary = "Fetch details about single user by id or UUID")
+    public ResponseEntity<UserDTO> getById(@PathVariable String idOrUuid) {
         log.info("Loading detail about single user");
 
-        return ResponseEntity.ok(super.getOne(id));
+        return ResponseEntity.ok(super.getOne(idOrUuid));
     }
 
     @PostMapping
@@ -85,34 +85,31 @@ public class UserController extends GenericController<
         return ResponseEntity.ok(userDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Sets user details")
     public ResponseEntity<UserDTO> put(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody UserDTO userDTO
     ) {
-        userDTO.setId(id);
-        return ResponseEntity.ok(this.putOne(userDTO));
+        return ResponseEntity.ok(this.putOne(idOrUuid, userDTO));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Updates user details")
     public ResponseEntity<UserDTO> patch(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody JsonPatch userDTO
     ) {
-        return ResponseEntity.ok(this.patchOne(id, userDTO));
+        return ResponseEntity.ok(this.patchOne(idOrUuid, userDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Deletes user")
-    public ResponseEntity<Void> delete(
-        @PathVariable Long id
-    ) {
-        this.deleteOne(id);
+    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) {
+        this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }
 }

@@ -16,7 +16,12 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.util.Collection;
 
-public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>> implements IGenericService<Entity, DTO, Filter> {
+public abstract class GenericService<
+    Entity extends BaseEntity,
+    DTO extends BaseDTO,
+    Filter,
+    Repository extends GenericRepository<Entity>
+    > implements IGenericService<Entity, DTO, Filter> {
     private final EntitySpecificationBuilder<Entity> specification = new EntitySpecificationBuilder<>();
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
@@ -24,16 +29,20 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     protected final LangUtil langUtil;
     protected final GenericMapper<Entity, DTO> mapper;
     protected final Repository repository;
-    protected final ApplicationExceptionFactory exceptionFactory;
+    protected final ApplicationExceptionFactory applicationExceptionFactory;
 
     protected GenericService(
-        LangUtil langUtil, Class<DTO> clazz, GenericMapper<Entity, DTO> mapper, Repository repository,
-        ApplicationExceptionFactory exceptionFactory, ObjectMapper objectMapper
+        LangUtil langUtil,
+        Class<DTO> clazz,
+        GenericMapper<Entity, DTO> mapper,
+        Repository repository,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        ObjectMapper objectMapper
     ) {
         this.langUtil = langUtil;
         this.repository = repository;
         this.mapper = mapper;
-        this.exceptionFactory = exceptionFactory;
+        this.applicationExceptionFactory = applicationExceptionFactory;
         this.clazz = clazz;
         this.objectMapper = objectMapper;
     }
@@ -48,7 +57,7 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         try {
             return repository.findAll(createSpecification(filter), pageable).map(mapper::toDTO);
         } catch (InvalidDataAccessApiUsageException exception) {
-            throw exceptionFactory.badRequest("Malformed api request");
+            throw applicationExceptionFactory.badRequest("Malformed api request");
         }
     }
 
@@ -56,25 +65,39 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         try {
             return repository.findAll(createSpecification(filter)).stream().map(mapper::toDTO).toList();
         } catch (InvalidDataAccessApiUsageException exception) {
-            throw exceptionFactory.badRequest("Malformed api request");
+            throw applicationExceptionFactory.badRequest("Malformed api request");
         }
     }
 
     public DTO getById(long id) throws ApplicationException {
-        return mapper.toDTO(repository.findById(id).orElseThrow(() -> exceptionFactory.resourceNotFound(
-                    langUtil.getMessage("error.generic.notFoundById.message")
-                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)
-                )
+        return mapper.toDTO(repository.findById(id).orElseThrow(() -> applicationExceptionFactory.resourceNotFound(
+            langUtil.getMessage("error.generic.notFoundById.message")
+                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
+    }
+
+    public DTO getByPublicId(java.util.UUID publicId) throws ApplicationException {
+        return mapper.toDTO(repository.findByPublicId(publicId).orElseThrow(
+            () -> applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.generic.notFoundByPublicId.message")
+                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), publicId)
             )
-        );
+        ));
     }
 
     public boolean exists(long id) {
         return repository.existsById(id);
     }
 
+    public boolean existsByPublicId(java.util.UUID publicId) {
+        return repository.existsByPublicId(publicId);
+    }
+
     public DTO save(DTO dto) {
         Entity entity = mapper.toEntity(dto);
+
+        if (entity.getPublicId() == null) {
+            entity.getPublicId();
+        }
 
         fetchRelations(entity, dto);
 
@@ -83,19 +106,19 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
 
     public DTO saveIfNotExists(DTO dto) throws ApplicationException {
         if (exists(dto.getId())) {
-            throw exceptionFactory.conflict(langUtil.getMessage("error.generic.alreadyExists.message"));
+            throw applicationExceptionFactory.conflict(langUtil.getMessage("error.generic.alreadyExists.message"));
         }
 
         return save(dto);
     }
 
     public DTO update(long id, DTO dto) throws ApplicationException {
-        Entity entity = repository.findById(id)
-            .orElseThrow(() -> exceptionFactory.resourceNotFound(
-                    langUtil.getMessage("error.generic.notFoundById.message")
-                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)
-                )
-            );
+        Entity entity = repository.findById(id).orElseThrow(
+            () -> applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.generic.notFoundById.message")
+                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)
+            )
+        );
 
         mapper.updateEntityFromDTO(entity, dto);
 
@@ -111,13 +134,13 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         try {
             patched = patch.apply(objectMapper.convertValue(dto, JsonNode.class));
         } catch (JsonPatchException e) {
-            throw exceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
+            throw applicationExceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
         }
 
         try {
             return this.update(id, objectMapper.treeToValue(patched, clazz));
         } catch (JsonProcessingException e) {
-            throw exceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
+            throw applicationExceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
         }
     }
 
@@ -128,7 +151,7 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
             return;
         }
 
-        throw exceptionFactory.methodNotAllowed(
+        throw applicationExceptionFactory.methodNotAllowed(
             langUtil.getMessage("error.generic.notFoundById.message")
                 .formatted(StringUtils.capitalize(clazz.getSimpleName()), id));
     }

@@ -41,8 +41,9 @@ public class UserService extends GenericService<
         if (optionalUserEntity.isEmpty()) {
             log.info("Tried to change password of user with username {}, but user with this username doesn't exist", username);
 
-            throw exceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byUsername", username));
+            throw applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.user.notFound.byUsername", username)
+            );
         }
 
         log.info("Changed {}'s password", username);

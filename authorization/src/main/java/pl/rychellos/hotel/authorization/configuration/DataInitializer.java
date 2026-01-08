@@ -78,12 +78,13 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 return;
             }
 
-            //TODO: install script
+            // TODO: install script
             String adminUsername = "admin";
             String rawPassword = UUID.randomUUID().toString();
 
             UserEntity admin = new UserEntity(
                 null,
+                UUID.randomUUID(),
                 adminUsername,
                 passwordEncoder.encode(rawPassword),
                 null,
@@ -91,7 +92,10 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 Set.of(roleAdmin.get())
             );
 
-            log.warn("Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}", adminUsername, rawPassword);
+            log.warn(
+                "Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}",
+                adminUsername, rawPassword
+            );
 
             userRepository.save(admin);
 
@@ -118,12 +122,17 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
     private void savePermissionIfMissing(CheckPermission annotation) {
         String name = String.format("%s:%s:%s",
             annotation.target().toUpperCase(),
-            annotation.action(),
-            annotation.scope()
+            annotation.action().name().toUpperCase(),
+            annotation.scope().name().toUpperCase()
         );
 
         if (!permissionRepository.existsByName(name)) {
-            log.info("Creating missing permission {}:{}:{}", annotation.target(), annotation.action().name(), annotation.scope().name());
+            log.info(
+                "Creating missing permission {}:{}:{}",
+                annotation.target().toUpperCase(),
+                annotation.action().name().toUpperCase(),
+                annotation.scope().name().toUpperCase()
+            );
 
             PermissionEntity entity = new PermissionEntity();
             entity.setName(name);

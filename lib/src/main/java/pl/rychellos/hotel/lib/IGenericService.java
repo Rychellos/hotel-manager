@@ -14,7 +14,11 @@ public interface IGenericService<Entity extends BaseEntity, DTO extends BaseDTO,
 
     DTO getById(long id) throws ApplicationException;
 
+    DTO getByPublicId(java.util.UUID publicId) throws ApplicationException;
+
     boolean exists(long id);
+
+    boolean existsByPublicId(java.util.UUID publicId);
 
     DTO save(DTO dto);
 

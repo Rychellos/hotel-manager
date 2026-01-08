@@ -5,6 +5,7 @@ import org.mapstruct.factory.Mappers;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -16,7 +17,13 @@ class CurrencyMapperTest {
     void shouldMapEntityToDto() {
         /// Given
         CurrencyEntity entity = new CurrencyEntity(
-            1L, "US Dollar", "USD", "001/A/2024", LocalDate.now(), 4.01
+            1L,
+            UUID.randomUUID(),
+            "US Dollar",
+            "USD",
+            "001/A/2024",
+            LocalDate.now(),
+            4.01
         );
 
         /// When
@@ -36,7 +43,13 @@ class CurrencyMapperTest {
     void shouldMapDtoToEntity() {
         /// Given
         CurrencyDTO dto = new CurrencyDTO(
-            2L, "Euro", "EUR", "002/B/2024", LocalDate.of(2024, 1, 1), 4.35
+            2L,
+            UUID.randomUUID(),
+            "Euro",
+            "EUR",
+            "002/B/2024",
+            LocalDate.of(2024, 1, 1),
+            4.35
         );
 
         /// When

@@ -32,7 +32,8 @@ public class PermissionController extends GenericController<
     protected PermissionController(
         PermissionService service,
         ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil) {
+        LangUtil langUtil
+    ) {
         super(service, applicationExceptionFactory, langUtil);
     }
 
@@ -45,11 +46,11 @@ public class PermissionController extends GenericController<
         return super.getPage(pageable, filter);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "PERMISSION", action = ActionType.READ, scope = ActionScope.ONE)
-    @Operation(summary = "Fetch details about single permission")
-    public PermissionDTO getById(@PathVariable long id) {
-        return super.getOne(id);
+    @Operation(summary = "Fetch details about single permission by id or UUID")
+    public PermissionDTO getById(@PathVariable String idOrUuid) {
+        return super.getOne(idOrUuid);
     }
 
     @PostMapping
@@ -59,34 +60,33 @@ public class PermissionController extends GenericController<
         return ResponseEntity.ok(this.createOne(permissionDTO));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{idOrUuid}")
     @CheckPermission(target = "PERMISSION", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Sets permission's details")
     public ResponseEntity<PermissionDTO> put(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody PermissionDTO permissionDTO
     ) {
-        permissionDTO.setId(id);
-        return ResponseEntity.ok(this.putOne(permissionDTO));
+        return ResponseEntity.ok(this.putOne(idOrUuid, permissionDTO));
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{idOrUuid}")
     @CheckPermission(target = "PERMISSION", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Updates permission's details")
     public ResponseEntity<PermissionDTO> patch(
-        @PathVariable Long id,
+        @PathVariable String idOrUuid,
         @RequestBody JsonPatch permissionDTO
     ) {
-        return ResponseEntity.ok(this.patchOne(id, permissionDTO));
+        return ResponseEntity.ok(this.patchOne(idOrUuid, permissionDTO));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "PERMISSION", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Deletes permission")
     public ResponseEntity<Void> delete(
-        @PathVariable Long id
+        @PathVariable String idOrUuid
     ) {
-        this.deleteOne(id);
+        this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }
 }

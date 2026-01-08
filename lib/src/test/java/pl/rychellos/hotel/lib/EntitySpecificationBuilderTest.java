@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Set;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -29,11 +30,20 @@ class EntitySpecificationBuilderTest {
     @Mock
     private Join<Object, Object> join;
 
-    /// 1. Mock Entities and DTOs for testing
     private static class TestEntity implements BaseEntity {
         @Override
         public Long getId() {
             return 1L;
+        }
+
+        @Override
+        public java.util.UUID getPublicId() {
+            return UUID.randomUUID();
+        }
+
+        @Override
+        public void setPublicId(UUID publicId) {
+            // No-op for testing
         }
     }
 
@@ -66,7 +76,6 @@ class EntitySpecificationBuilderTest {
         filter.name = "John";
 
         when(root.get("name")).thenReturn(path);
-        // Simulate 'deleted' field check
         when(root.get("deleted")).thenThrow(new IllegalArgumentException());
 
         /// When
@@ -139,7 +148,7 @@ class EntitySpecificationBuilderTest {
     void build_ShouldIgnoreNullFields_ByDefaultForAnnotation() {
         /// Given
         TestFilter filter = new TestFilter();
-        filter.name = null; // ignoreIfNull is true by default
+        filter.name = null;
 
         when(root.get("deleted")).thenThrow(new IllegalArgumentException());
 
@@ -156,11 +165,8 @@ class EntitySpecificationBuilderTest {
         /// Given
         TestFilter filter = new TestFilter();
 
-        // 1. Mock the path as a generic Path or specifically Path<Object>
         Path<Object> deletedPath = mock(Path.class);
 
-        // 2. Mock the root to return this path
-        // root.get(String) returns Path<X>, so we mock it to return our generic path
         when(root.get("deleted")).thenReturn(deletedPath);
 
         /// When
@@ -168,7 +174,6 @@ class EntitySpecificationBuilderTest {
         spec.toPredicate(root, query, cb);
 
         /// Then
-        // 3. Verify that the CriteriaBuilder was called with the path and the value 'false'
         verify(cb).equal(deletedPath, false);
     }
 

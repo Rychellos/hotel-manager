@@ -67,6 +67,24 @@ public abstract class BaseServiceTest<
     }
 
     @Test
+    void getByPublicId_ShouldReturnDto_WhenExists() {
+        /// Given
+        java.util.UUID publicId = java.util.UUID.randomUUID();
+        Entity entity = createEntity(1L);
+        DTO dto = createDTO(1L);
+
+        Mockito.when(repository.findByPublicId(publicId)).thenReturn(Optional.of(entity));
+        Mockito.when(mapper.toDTO(entity)).thenReturn(dto);
+
+        /// When
+        DTO result = service.getByPublicId(publicId);
+
+        /// Then
+        Assertions.assertNotNull(result);
+        Mockito.verify(repository).findByPublicId(publicId);
+    }
+
+    @Test
     void delete_ShouldCallRepository_WhenExists() {
         /// Given
         long id = 1L;

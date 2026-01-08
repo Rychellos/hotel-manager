@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -30,7 +31,15 @@ class CurrencyRepositoryTest {
     @Test
     void findByCodeAndEffectiveDate_shouldReturnEntity() {
         /// Given
-        CurrencyEntity entity = new CurrencyEntity(null, "dolar amerykański", "USD", "248/A/NBP/2025", TEST_DATE, 3.5848);
+        CurrencyEntity entity = new CurrencyEntity(
+            null,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            "USD",
+            "248/A/NBP/2025",
+            TEST_DATE,
+            3.5848
+        );
         currencyRepository.save(entity);
 
         /// When
@@ -54,7 +63,15 @@ class CurrencyRepositoryTest {
     @Test
     void findByCodeAndEffectiveDate_shouldReturnCurrency_whenExists() {
         /// Given
-        CurrencyEntity entity = new CurrencyEntity(null, "dolar amerykański", "USD", "248/A/NBP/2025", TEST_DATE, 3.5848);
+        CurrencyEntity entity = new CurrencyEntity(
+            null,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            "USD",
+            "248/A/NBP/2025",
+            TEST_DATE,
+            3.5848
+        );
         currencyRepository.save(entity);
 
         /// When
@@ -71,7 +88,15 @@ class CurrencyRepositoryTest {
     @Test
     void deleteById_shouldCallRepository() {
         /// Given
-        CurrencyEntity entity = new CurrencyEntity(null, "dolar amerykański", "USD", "248/A/NBP/2025", TEST_DATE, 3.5848);
+        CurrencyEntity entity = new CurrencyEntity(
+            null,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            "USD",
+            "248/A/NBP/2025",
+            TEST_DATE,
+            3.5848
+        );
         CurrencyEntity savedEntity = currencyRepository.save(entity);
 
         /// When
@@ -89,8 +114,24 @@ class CurrencyRepositoryTest {
         LocalDate date1 = LocalDate.of(2025, 12, 23);
         LocalDate date2 = LocalDate.of(2025, 12, 22);
 
-        CurrencyEntity usd1 = new CurrencyEntity(null, "dolar amerykański", "USD", "248/A/NBP/2025", date1, 3.5848);
-        CurrencyEntity usd2 = new CurrencyEntity(null, "dolar amerykański", "USD", "247/A/NBP/2025", date2, 3.5700);
+        CurrencyEntity usd1 = new CurrencyEntity(
+            null,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            "USD",
+            "248/A/NBP/2025",
+            date1,
+            3.5848
+        );
+        CurrencyEntity usd2 = new CurrencyEntity(
+            null,
+            UUID.randomUUID(),
+            "dolar amerykański",
+            "USD",
+            "247/A/NBP/2025",
+            date2,
+            3.5700
+        );
 
         currencyRepository.save(usd1);
         currencyRepository.save(usd2);

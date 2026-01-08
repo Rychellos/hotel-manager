@@ -10,6 +10,7 @@ import pl.rychellos.hotel.lib.BaseEntity;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -24,6 +25,9 @@ public class UserEntity implements UserDetails, BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
+
+    @Column(unique = true, nullable = false)
+    private UUID publicId = UUID.randomUUID();
 
     @Column(unique = true, nullable = false)
     private String username;
