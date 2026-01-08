@@ -1,7 +1,7 @@
 package pl.rychellos.hotel.currencyexchange;
 
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetchDTO;
 
 public interface ICurrencyClient {
-    CurrencyFetch fetchExchangeRate(String currencyCode);
+    CurrencyFetchDTO getRate(String currencyCode);
 }

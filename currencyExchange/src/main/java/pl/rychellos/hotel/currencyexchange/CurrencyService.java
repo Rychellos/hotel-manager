@@ -1,9 +1,11 @@
 package pl.rychellos.hotel.currencyexchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
+import org.springframework.web.client.HttpClientErrorException;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetchDTO;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyRateDTO;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyFilterDTO;
 import pl.rychellos.hotel.lib.GenericService;
@@ -14,6 +16,7 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyFilterDTO, CurrencyRepository> implements ICurrencyService {
     protected CurrencyRepository repository;
@@ -40,9 +43,15 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
             return mapper.toDTO(dbValue.get());
         }
 
-        CurrencyFetch currencyFetch = currencyClient.fetchExchangeRate(currencyCode);
+        CurrencyFetchDTO currencyFetch;
 
-        CurrencyRate currencyRate = currencyFetch.rates().getFirst();
+        try {
+            currencyFetch = currencyClient.getRate(currencyCode);
+        } catch (HttpClientErrorException e) {
+            throw exceptionFactory.resourceNotFound(langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode));
+        }
+
+        CurrencyRateDTO currencyRate = currencyFetch.rates().getFirst();
 
         if (currencyRate == null) {
             throw exceptionFactory.resourceNotFound(langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode));

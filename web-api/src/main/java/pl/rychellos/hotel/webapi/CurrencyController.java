@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.currencyexchange.CurrencyEntity;
 import pl.rychellos.hotel.currencyexchange.CurrencyRepository;
+import pl.rychellos.hotel.currencyexchange.ICurrencyService;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
@@ -15,6 +16,8 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
+
+import java.time.LocalDate;
 
 
 @RestController
@@ -25,17 +28,20 @@ public class CurrencyController extends GenericController<
     CurrencyFilterDTO,
     CurrencyRepository
     > {
+    private final ICurrencyService iCurrencyService;
+
     protected CurrencyController(
-        GenericService<CurrencyEntity, CurrencyDTO, CurrencyFilterDTO, CurrencyRepository> service,
+        ICurrencyService service,
         ApplicationExceptionFactory applicationExceptionFactory,
         LangUtil langUtil
     ) {
-        super(service, applicationExceptionFactory, langUtil);
+        super((GenericService<CurrencyEntity, CurrencyDTO, CurrencyFilterDTO, CurrencyRepository>) service, applicationExceptionFactory, langUtil);
+        this.iCurrencyService = service;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{code}")
     @CheckPermission(target = "CURRENCY", action = ActionType.READ, scope = ActionScope.ONE)
-    public CurrencyDTO get(@PathVariable Long id) {
-        return this.getOne(id);
+    public CurrencyDTO get(@PathVariable String code) {
+        return iCurrencyService.get(code, LocalDate.now());
     }
 }

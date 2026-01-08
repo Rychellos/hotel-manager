@@ -9,8 +9,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.http.HttpStatus;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetchDTO;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyRateDTO;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
@@ -93,15 +93,15 @@ class CurrencyServiceTest {
         /// Given
         when(repository.findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, TEST_EFFECTIVE_DATE)).thenReturn(Optional.empty());
 
-        CurrencyRate rate = new CurrencyRate(TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
-        ArrayList<CurrencyRate> rates = new ArrayList<>();
+        CurrencyRateDTO rate = new CurrencyRateDTO(TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
+        ArrayList<CurrencyRateDTO> rates = new ArrayList<>();
         rates.add(rate);
-        CurrencyFetch fetch = new CurrencyFetch("A", "dolar amerykański", TEST_CURRENCY_CODE, rates);
+        CurrencyFetchDTO fetch = new CurrencyFetchDTO("A", "dolar amerykański", TEST_CURRENCY_CODE, rates);
 
         CurrencyEntity savedEntity = new CurrencyEntity(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
         CurrencyDTO savedDTO = new CurrencyDTO(TEST_ID, "dolar amerykański", TEST_CURRENCY_CODE, TEST_NO, TEST_EFFECTIVE_DATE, TEST_MID);
 
-        when(currencyClient.fetchExchangeRate(TEST_CURRENCY_CODE)).thenReturn(fetch);
+        when(currencyClient.getRate(TEST_CURRENCY_CODE)).thenReturn(fetch);
 
         when(mapper.toEntity(any(CurrencyDTO.class))).thenReturn(savedEntity);
         when(repository.save(any(CurrencyEntity.class))).thenReturn(savedEntity);
@@ -116,7 +116,7 @@ class CurrencyServiceTest {
         assertEquals("dolar amerykański", result.getCurrency());
 
         verify(repository).findByCodeAndEffectiveDate(TEST_CURRENCY_CODE, TEST_EFFECTIVE_DATE);
-        verify(currencyClient).fetchExchangeRate(TEST_CURRENCY_CODE);
+        verify(currencyClient).getRate(TEST_CURRENCY_CODE);
         verify(repository).save(any(CurrencyEntity.class));
     }
 
@@ -148,7 +148,7 @@ class CurrencyServiceTest {
         ApplicationException expectedException = new ApplicationException("NOT_FOUND", errorMessage, HttpStatus.NOT_FOUND);
 
         when(repository.findByCodeAndEffectiveDate("XXX", LocalDate.now())).thenReturn(Optional.empty());
-        when(currencyClient.fetchExchangeRate("XXX")).thenThrow(expectedException);
+        when(currencyClient.getRate("XXX")).thenThrow(expectedException);
 
         /// When & Then
         ApplicationException thrown = assertThrows(ApplicationException.class, () -> currencyService.delete("XXX", LocalDate.now()));
@@ -167,15 +167,15 @@ class CurrencyServiceTest {
         LocalDate eurEffectiveDate = LocalDate.of(2025, 12, 23);
         double eurMid = 4.2274;
 
-        CurrencyRate eurRate = new CurrencyRate(eurNo, eurEffectiveDate, eurMid);
-        CurrencyFetch eurFetch = new CurrencyFetch("A", "Euro", eurCode, new ArrayList<>(List.of(eurRate)));
+        CurrencyRateDTO eurRate = new CurrencyRateDTO(eurNo, eurEffectiveDate, eurMid);
+        CurrencyFetchDTO eurFetch = new CurrencyFetchDTO("A", "Euro", eurCode, new ArrayList<>(List.of(eurRate)));
 
         CurrencyEntity eurEntity = new CurrencyEntity(2L, "Euro", eurCode, eurNo, eurEffectiveDate, eurMid);
         CurrencyDTO eurDTO = new CurrencyDTO(2L, "Euro", eurCode, eurNo, eurEffectiveDate, eurMid);
 
         /// When
         when(repository.findByCodeAndEffectiveDate(eurCode, eurEffectiveDate)).thenReturn(Optional.empty());
-        when(currencyClient.fetchExchangeRate(eurCode)).thenReturn(eurFetch);
+        when(currencyClient.getRate(eurCode)).thenReturn(eurFetch);
         when(mapper.toDTO(any())).thenReturn(eurDTO);
         when(mapper.toEntity(any())).thenReturn(eurEntity);
         when(repository.save(any())).thenReturn(eurEntity);
