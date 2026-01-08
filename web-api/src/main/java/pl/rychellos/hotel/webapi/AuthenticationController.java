@@ -7,13 +7,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import pl.rychellos.hotel.authorization.dto.PasswordUpdateDTO;
 import pl.rychellos.hotel.authorization.service.AuthService;
 import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResponseDTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResponseOAuth2DTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
+import pl.rychellos.hotel.authorization.user.UserService;
+import pl.rychellos.hotel.authorization.user.dto.UserDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.webapi.configuration.SwaggerConfiguration;
+
+import java.security.Principal;
 
 @Slf4j
 @RestController
@@ -21,9 +28,20 @@ import pl.rychellos.hotel.webapi.configuration.SwaggerConfiguration;
 @Tag(name = "Authentication", description = "Endpoints for user authentication")
 public class AuthenticationController {
     private final AuthService authService;
+    private final UserService userService;
+    private final ApplicationExceptionFactory applicationExceptionFactory;
+    private final LangUtil langUtil;
 
-    public AuthenticationController(AuthService authService) {
+    public AuthenticationController(
+        AuthService authService,
+        UserService userService,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         this.authService = authService;
+        this.userService = userService;
+        this.applicationExceptionFactory = applicationExceptionFactory;
+        this.langUtil = langUtil;
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -110,5 +128,22 @@ public class AuthenticationController {
         return ResponseEntity.noContent()
             .header(HttpHeaders.SET_COOKIE, cookie.toString())
             .build();
+    }
+
+    @PostMapping("/changePassword")
+    @Operation(summary = "Updates user's password")
+    public ResponseEntity<UserDTO> updatePassword(
+        @RequestBody PasswordUpdateDTO passwordUpdateDTO,
+        Principal principal
+    ) {
+        String username = principal.getName();
+
+        if (authService.verifyPassword(username, passwordUpdateDTO.oldPassword())) {
+            return ResponseEntity.ok(userService.updatePassword(username, passwordUpdateDTO.newPassword()));
+        } else {
+            throw this.applicationExceptionFactory.badRequest(
+                langUtil.getMessage("error.user.password.change.message")
+            );
+        }
     }
 }

@@ -3,6 +3,7 @@ package pl.rychellos.hotel.authorization.service;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
@@ -14,8 +15,10 @@ import pl.rychellos.hotel.authorization.token.RefreshTokenService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,19 +29,30 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
     private final ApplicationExceptionFactory exceptionFactory;
+    private final LangUtil langUtil;
+    private final PasswordEncoder passwordEncoder;
 
     public AuthService(
         UserRepository userRepository,
         JwtService jwtService,
         AuthenticationManager authenticationManager,
         RefreshTokenService refreshTokenService,
-        ApplicationExceptionFactory exceptionFactory
+        ApplicationExceptionFactory exceptionFactory,
+        LangUtil langUtil, PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.refreshTokenService = refreshTokenService;
         this.exceptionFactory = exceptionFactory;
+        this.langUtil = langUtil;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    public Boolean verifyPassword(String username, String password) {
+        Optional<UserEntity> user = userRepository.findByUsername(username);
+
+        return user.filter(userEntity -> this.passwordEncoder.matches(password, userEntity.getPassword())).isPresent();
     }
 
     public AuthResultDTO authenticate(AuthRequestDTO request) {
@@ -50,7 +64,9 @@ public class AuthService {
         );
 
         UserEntity user = userRepository.findByUsername(request.username())
-            .orElseThrow(() -> exceptionFactory.resourceNotFound("User not found"));
+            .orElseThrow(() -> exceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.user.notFound.byUsername").formatted(request.username())
+            ));
 
         String jwtToken = jwtService.generateToken(user);
         RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user);

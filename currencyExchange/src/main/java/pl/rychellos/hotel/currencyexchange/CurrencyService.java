@@ -37,11 +37,15 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
 
     //    @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
     public CurrencyDTO get(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
+        currencyCode = currencyCode.toUpperCase();
+        log.info("Checking if rate for {} on day {} is present in database...", currencyCode, effectiveDate);
         Optional<CurrencyEntity> dbValue = repository.findByCodeAndEffectiveDate(currencyCode, effectiveDate);
 
         if (dbValue.isPresent()) {
+            log.info("Rate present");
             return mapper.toDTO(dbValue.get());
         }
+        log.info("Rate not present, fetching from NBP api");
 
         CurrencyFetchDTO currencyFetch;
 

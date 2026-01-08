@@ -6,13 +6,19 @@ import org.springframework.data.domain.Pageable;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-public abstract class GenericController<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>> {
-    protected final GenericService<Entity, DTO, Filter, Repository> service;
+public abstract class GenericController<
+    Entity extends BaseEntity,
+    DTO extends BaseDTO,
+    Filter,
+    Repository extends GenericRepository<Entity>,
+    Service extends GenericService<Entity, DTO, Filter, Repository>
+    > {
+    protected final Service service;
     protected final ApplicationExceptionFactory applicationExceptionFactory;
     protected final LangUtil langUtil;
 
     protected GenericController(
-        GenericService<Entity, DTO, Filter, Repository> service, ApplicationExceptionFactory applicationExceptionFactory,
+        Service service, ApplicationExceptionFactory applicationExceptionFactory,
         LangUtil langUtil
     ) {
         this.service = service;

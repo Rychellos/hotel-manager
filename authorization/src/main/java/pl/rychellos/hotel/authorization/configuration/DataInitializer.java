@@ -86,6 +86,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
                 null,
                 adminUsername,
                 passwordEncoder.encode(rawPassword),
+                null,
                 "admin@hotel.com",
                 Set.of(roleAdmin.get())
             );
@@ -116,9 +117,10 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
 
     private void savePermissionIfMissing(CheckPermission annotation) {
         String name = String.format("%s:%s:%s",
-            annotation.target(),
+            annotation.target().toUpperCase(),
             annotation.action(),
-            annotation.scope());
+            annotation.scope()
+        );
 
         if (!permissionRepository.existsByName(name)) {
             log.info("Creating missing permission {}:{}:{}", annotation.target(), annotation.action().name(), annotation.scope().name());

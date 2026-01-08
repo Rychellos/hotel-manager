@@ -31,6 +31,9 @@ public class UserEntity implements UserDetails, BaseEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = true)
+    private Boolean nextPasswordChange = null;
+
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -57,5 +60,4 @@ public class UserEntity implements UserDetails, BaseEntity {
 
         return authorities;
     }
-
 }
