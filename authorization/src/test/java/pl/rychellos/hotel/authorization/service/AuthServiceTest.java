@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.http.ResponseCookie;
 import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
 import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
 import pl.rychellos.hotel.authorization.token.RefreshTokenEntity;
@@ -19,6 +20,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -93,5 +95,33 @@ class AuthServiceTest {
 
         // Then
         verify(refreshTokenService).revokeToken("token-to-revoke");
+    }
+
+    @Test
+    void createRefreshTokenCookie_ShouldCreateCorrectCookie() {
+        // When
+        ResponseCookie cookie = authService.createRefreshTokenCookie("token-value");
+
+        // Then
+        assertNotNull(cookie);
+        assertEquals("refresh_token", cookie.getName());
+        assertEquals("token-value", cookie.getValue());
+        assertTrue(cookie.isHttpOnly());
+        assertEquals("/", cookie.getPath());
+        assertEquals(7 * 24 * 60 * 60, cookie.getMaxAge().getSeconds());
+    }
+
+    @Test
+    void createLogoutCookie_ShouldCreateExpiredCookie() {
+        // When
+        ResponseCookie cookie = authService.createLogoutCookie();
+
+        // Then
+        assertNotNull(cookie);
+        assertEquals("refresh_token", cookie.getName());
+        assertTrue(cookie.getValue() == null || cookie.getValue().isEmpty());
+        assertTrue(cookie.isHttpOnly());
+        assertEquals("/", cookie.getPath());
+        assertEquals(0, cookie.getMaxAge().getSeconds());
     }
 }

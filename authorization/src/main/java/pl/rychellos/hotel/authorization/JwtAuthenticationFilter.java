@@ -15,39 +15,55 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import pl.rychellos.hotel.authorization.service.JwtService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
+import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
+import pl.rychellos.hotel.lib.lang.LangUtil;
 
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
     private final HandlerExceptionResolver handlerExceptionResolver;
+    private final ApplicationExceptionFactory applicationExceptionFactory;
+    private final LangUtil langUtil;
 
-    public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService, HandlerExceptionResolver handlerExceptionResolver) {
+    public JwtAuthenticationFilter(
+        JwtService jwtService,
+        UserDetailsService userDetailsService,
+        HandlerExceptionResolver handlerExceptionResolver,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        LangUtil langUtil
+    ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
         this.handlerExceptionResolver = handlerExceptionResolver;
+        this.applicationExceptionFactory = applicationExceptionFactory;
+        this.langUtil = langUtil;
     }
 
     private void processToken(HttpServletRequest request) throws ApplicationException {
         log.info("Started processing access token");
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         String jwt;
-        String userEmail;
+        String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.info("Invalid data provided as token");
-            return;
+
+            throw applicationExceptionFactory.unauthorized(
+                langUtil.getMessage("error.token.access.missing")
+            );
         }
 
         jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);
+        username = jwtService.extractUsername(jwt);
 
         if (
-            userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null
+            username != null && SecurityContextHolder.getContext().getAuthentication() == null
         ) {
             log.info("Began authenticating user");
+            UserEntity userDetails;
 
-            UserEntity userDetails = (UserEntity) this.userDetailsService.loadUserByUsername(userEmail);
+            userDetails = (UserEntity) this.userDetailsService.loadUserByUsername(username);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 log.info("Provided token is valid");
@@ -65,8 +81,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             } else {
                 log.info("Couldn't validate token validated successfully");
+
+                throw applicationExceptionFactory.badRequest(
+                    langUtil.getMessage("error.token.access.malformed")
+                );
             }
-        } else if (userEmail == null) {
+        } else if (username == null) {
             log.info("User email is null");
         } else {
             log.info("User already authenticated");
@@ -100,7 +120,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 handlerExceptionResolver.resolveException(request, response, null, applicationException);
             }
         } catch (Exception exception) {
-            log.info("Failed to process a token", exception);
+            log.info("Failed to process a token.", exception);
 
             if (!response.isCommitted()) {
                 handlerExceptionResolver.resolveException(request, response, null, exception);

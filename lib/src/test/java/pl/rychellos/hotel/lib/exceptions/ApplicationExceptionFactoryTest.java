@@ -65,14 +65,14 @@ class ApplicationExceptionFactoryTest {
 
     @Test
     void internalServerError_ShouldReturnCorrectException() {
-        mockTitle("error.internalServerError", "Internal Server Error");
+        mockTitle("error.generic.internalServerError.title", "Internal Server Error");
         ApplicationException ex = factory.internalServerError(testDetail);
         assertException(ex, "Internal Server Error", testDetail, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Test
     void invalidPatchError_ShouldReturnCorrectException() {
-        mockTitle("error.invalidPatchError", "Invalid Patch");
+        mockTitle("error.generic.invalidPatch.title", "Invalid Patch");
         ApplicationException ex = factory.invalidPatchError(testDetail);
         assertException(ex, "Invalid Patch", testDetail, HttpStatus.BAD_REQUEST);
     }

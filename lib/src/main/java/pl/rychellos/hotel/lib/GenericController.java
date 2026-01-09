@@ -6,18 +6,43 @@ import org.springframework.data.domain.Pageable;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-public abstract class GenericController<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>> {
-    protected final GenericService<Entity, DTO, Filter, Repository> service;
+import java.util.UUID;
+
+public abstract class GenericController<
+    Entity extends BaseEntity,
+    DTO extends BaseDTO,
+    Filter,
+    Repository extends GenericRepository<Entity>,
+    Service extends GenericService<Entity, DTO, Filter, Repository>
+    > {
+    protected final Service service;
     protected final ApplicationExceptionFactory applicationExceptionFactory;
     protected final LangUtil langUtil;
 
     protected GenericController(
-        GenericService<Entity, DTO, Filter, Repository> service, ApplicationExceptionFactory applicationExceptionFactory,
+        Service service,
+        ApplicationExceptionFactory applicationExceptionFactory,
         LangUtil langUtil
     ) {
         this.service = service;
         this.applicationExceptionFactory = applicationExceptionFactory;
         this.langUtil = langUtil;
+    }
+
+    protected long resolveId(String idOrUuid) {
+        try {
+            return Long.parseLong(idOrUuid);
+        } catch (NumberFormatException e) {
+            try {
+                UUID publicId = UUID.fromString(idOrUuid);
+
+                return getOne(publicId).getId();
+            } catch (IllegalArgumentException ex) {
+                throw applicationExceptionFactory.badRequest(
+                    langUtil.getMessage("error.generic.invalidIdFormat.message")
+                );
+            }
+        }
     }
 
     // GET - fetch page
@@ -33,6 +58,14 @@ public abstract class GenericController<Entity extends BaseEntity, DTO extends B
         return service.getById(id);
     }
 
+    protected DTO getOne(UUID publicId) {
+        return service.getByPublicId(publicId);
+    }
+
+    protected DTO getOne(String idOrUuid) {
+        return getOne(resolveId(idOrUuid));
+    }
+
     // POST - create one
     protected DTO createOne(DTO dto) {
         return service.saveIfNotExists(dto);
@@ -43,13 +76,30 @@ public abstract class GenericController<Entity extends BaseEntity, DTO extends B
         return service.save(dto);
     }
 
+    protected DTO putOne(String idOrUuid, DTO dto) {
+        dto.setId(resolveId(idOrUuid));
+        return putOne(dto);
+    }
+
     // PATCH - partial update if exists
     protected DTO patchOne(long id, JsonPatch patch) {
         return service.patch(id, patch);
     }
 
+    protected DTO patchOne(String idOrUuid, JsonPatch patch) {
+        return patchOne(resolveId(idOrUuid), patch);
+    }
+
     // DELETE
     protected void deleteOne(long id) {
         service.delete(id);
+    }
+
+    protected void deleteOne(UUID publicId) {
+        deleteOne(getOne(publicId).getId());
+    }
+
+    protected void deleteOne(String idOrUuid) {
+        deleteOne(resolveId(idOrUuid));
     }
 }

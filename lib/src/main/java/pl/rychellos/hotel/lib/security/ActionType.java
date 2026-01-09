@@ -2,7 +2,8 @@ package pl.rychellos.hotel.lib.security;
 
 public enum ActionType {
     READ,
-    WRITE,
+    CREATE,
+    EDIT,
     DELETE,
     EXECUTE,
     ADMIN

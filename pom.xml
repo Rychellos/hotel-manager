@@ -17,13 +17,13 @@
         <module>room</module>
         <module>conversation</module>
         <module>fault</module>
+        <module>media</module>
         <module>currencyExchange</module>
+        <module>storage</module>
     </modules>
 
     <properties>
         <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <spring-boot.version>4.0.0</spring-boot.version>

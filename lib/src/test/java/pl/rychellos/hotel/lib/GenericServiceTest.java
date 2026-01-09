@@ -1,6 +1,8 @@
 package pl.rychellos.hotel.lib;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,25 +13,26 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.util.Optional;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GenericServiceTest {
-
-    // Concrete implementations for testing abstract classes
     private static class TestEntity implements BaseEntity {
-        public Long getId() {
-            return 1L;
-        }
+        @Getter
+        private Long id = 1L;
+        @Getter
+        @Setter
+        private UUID publicId = UUID.randomUUID();
     }
 
+    @Getter
+    @Setter
     private static class TestDTO implements BaseDTO {
-        public Long getId() {
-            return 1L;
-        }
+        private Long id = 1L;
+        private UUID publicId = UUID.randomUUID();
     }
 
     private static class TestFilter {
@@ -38,16 +41,35 @@ class GenericServiceTest {
     private interface TestRepository extends GenericRepository<TestEntity> {
     }
 
-    private class TestService extends GenericService<TestEntity, TestDTO, TestFilter, TestRepository> {
-        public TestService(LangUtil langUtil, GenericMapper<TestEntity, TestDTO> mapper,
-                           TestRepository repository, ApplicationExceptionFactory exceptionFactory,
-                           ObjectMapper objectMapper) {
+    private static class TestService extends GenericService<
+        TestEntity,
+        TestDTO,
+        TestFilter,
+        TestRepository
+        > {
+        public TestService(
+            LangUtil langUtil,
+            GenericMapper<TestEntity, TestDTO> mapper,
+            TestRepository repository,
+            ApplicationExceptionFactory exceptionFactory,
+            ObjectMapper objectMapper
+        ) {
             super(langUtil, TestDTO.class, mapper, repository, exceptionFactory, objectMapper);
         }
 
         @Override
         protected void fetchRelations(TestEntity entity, TestDTO dto) {
             // No-op for base testing
+        }
+
+        @Override
+        public TestDTO getByPublicId(UUID publicId) {
+            return super.getByPublicId(publicId);
+        }
+
+        @Override
+        public boolean existsByPublicId(UUID publicId) {
+            return super.existsByPublicId(publicId);
         }
     }
 
@@ -88,7 +110,8 @@ class GenericServiceTest {
         // Given
         when(repository.findById(1L)).thenReturn(Optional.empty());
         when(langUtil.getMessage(anyString())).thenReturn("Not Found %s %s");
-        when(exceptionFactory.resourceNotFound(anyString())).thenReturn(new ApplicationException("Title", "Detail", null));
+        when(exceptionFactory.resourceNotFound(anyString()))
+            .thenReturn(new ApplicationException("Title", "Detail", null));
 
         // When & Then
         assertThrows(ApplicationException.class, () -> service.getById(1L));
@@ -105,5 +128,36 @@ class GenericServiceTest {
 
         // Then
         verify(repository).deleteById(1L);
+    }
+
+    @Test
+    void getByPublicId_ShouldReturnDto_WhenEntityExists() {
+        // Given
+        UUID publicId = UUID.randomUUID();
+        TestEntity entity = new TestEntity();
+        TestDTO dto = new TestDTO();
+        when(repository.findByPublicId(publicId)).thenReturn(Optional.of(entity));
+        when(mapper.toDTO(entity)).thenReturn(dto);
+
+        // When
+        TestDTO result = service.getByPublicId(publicId);
+
+        // Then
+        assertNotNull(result);
+        verify(repository).findByPublicId(publicId);
+    }
+
+    @Test
+    void existsByPublicId_ShouldReturnTrue_WhenExists() {
+        // Given
+        UUID publicId = UUID.randomUUID();
+        when(repository.existsByPublicId(publicId)).thenReturn(true);
+
+        // When
+        boolean result = service.existsByPublicId(publicId);
+
+        // Then
+        assertTrue(result);
+        verify(repository).existsByPublicId(publicId);
     }
 }

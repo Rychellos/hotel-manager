@@ -1,14 +1,13 @@
 package pl.rychellos.hotel.currencyexchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetch;
-import pl.rychellos.hotel.currencyexchange.contract.CurrencyRate;
+import org.springframework.web.client.HttpClientErrorException;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyFetchDTO;
+import pl.rychellos.hotel.currencyexchange.contract.CurrencyRateDTO;
 import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
-import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTOFilter;
-import pl.rychellos.hotel.lib.GenericMapper;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyFilterDTO;
 import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
@@ -17,43 +16,63 @@ import pl.rychellos.hotel.lib.lang.LangUtil;
 import java.time.LocalDate;
 import java.util.Optional;
 
+@Slf4j
 @Service
-public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyDTOFilter, CurrencyRepository> implements ICurrencyService {
+public class CurrencyService extends GenericService<
+    CurrencyEntity,
+    CurrencyDTO,
+    CurrencyFilterDTO,
+    CurrencyRepository
+    > implements ICurrencyService {
     protected CurrencyRepository repository;
     protected ICurrencyClient currencyClient;
 
     protected CurrencyService(
         LangUtil langUtil,
-        Class<CurrencyDTO> clazz,
-        GenericMapper<CurrencyEntity, CurrencyDTO> mapper,
+        CurrencyMapper mapper,
         CurrencyRepository repository,
         ApplicationExceptionFactory exceptionFactory,
         ObjectMapper objectMapper,
         ICurrencyClient currencyClient
     ) {
-        super(langUtil, clazz, mapper, repository, exceptionFactory, objectMapper);
+        super(langUtil, CurrencyDTO.class, mapper, repository, exceptionFactory, objectMapper);
         this.repository = repository;
         this.currencyClient = currencyClient;
     }
 
-    @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    // @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
     public CurrencyDTO get(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
+        currencyCode = currencyCode.toUpperCase();
+        log.info("Checking if rate for {} on day {} is present in database...", currencyCode, effectiveDate);
         Optional<CurrencyEntity> dbValue = repository.findByCodeAndEffectiveDate(currencyCode, effectiveDate);
 
         if (dbValue.isPresent()) {
+            log.info("Rate present");
             return mapper.toDTO(dbValue.get());
         }
+        log.info("Rate not present, fetching from NBP api");
 
-        CurrencyFetch currencyFetch = currencyClient.fetchExchangeRate(currencyCode);
+        CurrencyFetchDTO currencyFetch;
 
-        CurrencyRate currencyRate = currencyFetch.rates().getFirst();
+        try {
+            currencyFetch = currencyClient.getRate(currencyCode);
+        } catch (HttpClientErrorException e) {
+            throw applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode)
+            );
+        }
+
+        CurrencyRateDTO currencyRate = currencyFetch.rates().getFirst();
 
         if (currencyRate == null) {
-            throw exceptionFactory.resourceNotFound(langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode));
+            throw applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode)
+            );
         }
 
         CurrencyDTO currencyDTO = new CurrencyDTO(
             null,
+            java.util.UUID.randomUUID(),
             currencyFetch.currency(),
             currencyFetch.code(),
             currencyRate.no(),
@@ -64,13 +83,20 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
         return save(currencyDTO);
     }
 
-    @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
-    public void delete(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
+    // @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    public void delete(
+        String currencyCode,
+        LocalDate effectiveDate
+    ) throws ApplicationException {
         super.delete(get(currencyCode, effectiveDate).getId());
     }
 
     @Override
-    public double calculateExchangeRate(String currencyCode, LocalDate effectiveDate, double amount) throws ApplicationException {
+    public double calculateExchangeRate(
+        String currencyCode,
+        LocalDate effectiveDate,
+        double amount
+    ) throws ApplicationException {
         return amount / get(currencyCode, effectiveDate).getMid();
     }
 

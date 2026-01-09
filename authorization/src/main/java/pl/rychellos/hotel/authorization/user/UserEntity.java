@@ -10,6 +10,7 @@ import pl.rychellos.hotel.lib.BaseEntity;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
@@ -26,10 +27,16 @@ public class UserEntity implements UserDetails, BaseEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
+    private UUID publicId = UUID.randomUUID();
+
+    @Column(unique = true, nullable = false)
     private String username;
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = true)
+    private Boolean nextPasswordChange = null;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -49,10 +56,12 @@ public class UserEntity implements UserDetails, BaseEntity {
 
         authorities.addAll(roles.stream()
             .flatMap(role -> role.getPermissions().stream())
-            .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-            .collect(Collectors.toSet()));
+            .map(permission -> new SimpleGrantedAuthority(
+                permission.getName()
+            ))
+            .collect(Collectors.toSet())
+        );
 
         return authorities;
     }
-
 }

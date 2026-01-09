@@ -20,22 +20,29 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApplicationException.class)
     public ProblemDetail handleApplicationException(ApplicationException exception) {
-        log.error("{}: {}", exception.getTitle(), exception.getMessage());
-        
+        log.info("{}: {}", exception.getTitle(), exception.getDetail());
+
         return exception.getProblemDetail();
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDeniedException(AccessDeniedException exception) {
-        log.error("Access denied: {}", exception.getMessage());
+        log.info("Access denied", exception);
 
         return applicationExceptionFactory.forbidden(exception.getMessage()).getProblemDetail();
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthenticationException(AuthenticationException exception) {
-        log.error("Authentication failed: {}", exception.getMessage());
+        log.error("Unhandled access denied", exception);
 
         return applicationExceptionFactory.unauthorized(exception.getMessage()).getProblemDetail();
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleException(Exception exception) {
+        log.error("Unhandled error", exception);
+
+        return applicationExceptionFactory.internalServerError(exception.getMessage()).getProblemDetail();
     }
 }

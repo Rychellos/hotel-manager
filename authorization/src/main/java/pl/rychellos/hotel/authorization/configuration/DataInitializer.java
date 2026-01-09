@@ -2,8 +2,6 @@ package pl.rychellos.hotel.authorization.configuration;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NonNull;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,81 +14,94 @@ import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.authorization.role.RoleRepository;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
-import pl.rychellos.hotel.lib.security.PermissionRegistry;
 
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DataInitializer implements CommandLineRunner, ApplicationListener<ContextRefreshedEvent> {
+public class DataInitializer implements ApplicationListener<ContextRefreshedEvent> {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
     private final PasswordEncoder passwordEncoder;
-    private final List<PermissionRegistry> permissionRegistries;
     private final RequestMappingHandlerMapping handlerMapping;
 
-    @Override
-    public void run(String @NonNull ... args) {
-        log.info("Checking if data initialization is needed...");
+    public void checkAdminRole() {
+        log.info("Checking if admin role exists...");
 
-        // Ensure ROLE_ADMIN exists
-        RoleEntity adminRole = roleRepository.findByName("ROLE_ADMIN")
-            .orElseGet(() -> {
-                log.info("Creating admin role...");
+        Optional<RoleEntity> adminRoleOptional = roleRepository.findByName("ROLE_ADMIN");
+        RoleEntity adminRole;
 
-                RoleEntity role = new RoleEntity();
-                role.setName("ROLE_ADMIN");
-                role.setDescription("Administrator role");
+        if (adminRoleOptional.isEmpty()) {
+            log.info("Admin role not found. Creating ROLE_ADMIN");
 
-                return roleRepository.save(role);
-            });
+            RoleEntity role = new RoleEntity();
+            role.setName("ROLE_ADMIN");
+            role.setDescription("Administrator role");
 
-        // Auto-discover and seed permissions
-        Set<PermissionEntity> allPermissions = new HashSet<>();
-        for (PermissionRegistry registry : permissionRegistries) {
-            registry.getPermissions().forEach(def -> {
-                String pName = def.toPermissionString();
-                PermissionEntity permission = permissionRepository.findByName(pName)
-                    .orElseGet(() -> {
-                        PermissionEntity p = new PermissionEntity();
-                        p.setName(pName);
-                        return permissionRepository.save(p);
-                    });
-                allPermissions.add(permission);
-            });
+            adminRole = role;
+        } else {
+            log.info("Admin role found. Aborting.");
+            adminRole = adminRoleOptional.get();
         }
 
+        List<PermissionEntity> allPermissions = permissionRepository.findAll();
+
         // Grant all permissions to ROLE_ADMIN
-        adminRole.getPermissions().addAll(allPermissions);
+        if (adminRole.getPermissions().isEmpty()) {
+            log.info("Added all permissions to ROLE_ADMIN");
+            adminRole.getPermissions().addAll(allPermissions);
+        }
+
+        if (adminRole.getPermissions().size() != allPermissions.size()) {
+            log.info("Added all new permissions to ROLE_ADMIN");
+            adminRole.getPermissions().addAll(allPermissions);
+        }
+
         roleRepository.save(adminRole);
+    }
+
+    public void checkInitialUser() {
+        log.info("Checking if creation of initial user is needed...");
 
         if (userRepository.count() == 0) {
-            log.info("Creating admin user...");
+            log.info("User table is empty. Creating initial user");
 
-            //TODO: install script
+            Optional<RoleEntity> roleAdmin = roleRepository.findByName("ROLE_ADMIN");
+
+            if (roleAdmin.isEmpty()) {
+                log.warn("Could not find ROLE_ADMIN. Cannot create initial user without admin role. Aborting.");
+                return;
+            }
+
+            // TODO: install script
             String adminUsername = "admin";
             String rawPassword = UUID.randomUUID().toString();
 
             UserEntity admin = new UserEntity(
                 null,
+                UUID.randomUUID(),
                 adminUsername,
                 passwordEncoder.encode(rawPassword),
+                null,
                 "admin@hotel.com",
-                new HashSet<>(Set.of(adminRole))
+                Set.of(roleAdmin.get())
             );
 
-            log.warn("Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}", adminUsername, rawPassword);
+            log.warn(
+                "Created admin user with information: { \"username\": \"{}\", \"password\": \"{}\"}",
+                adminUsername, rawPassword
+            );
 
             userRepository.save(admin);
 
-            log.info("Admin user seeded successfully.");
+            log.info("Admin user created successfully.");
         } else {
-            log.info("Seeding not necessary, users present in the database");
+            log.info("User table is not empty. Aborting.");
         }
     }
 
@@ -103,17 +114,26 @@ public class DataInitializer implements CommandLineRunner, ApplicationListener<C
                 savePermissionIfMissing(annotation);
             }
         });
+
+        this.checkAdminRole();
+        this.checkInitialUser();
     }
 
     private void savePermissionIfMissing(CheckPermission annotation) {
-        log.info("Creating missing permission {}:{}:{}", annotation.target(), annotation.action().name(), annotation.scope().name());
-
-        String name = String.format("%s_%s_%s",
-            annotation.target(),
-            annotation.action(),
-            annotation.scope());
+        String name = String.format("%s:%s:%s",
+            annotation.target().toUpperCase(),
+            annotation.action().name().toUpperCase(),
+            annotation.scope().name().toUpperCase()
+        );
 
         if (!permissionRepository.existsByName(name)) {
+            log.info(
+                "Creating missing permission {}:{}:{}",
+                annotation.target().toUpperCase(),
+                annotation.action().name().toUpperCase(),
+                annotation.scope().name().toUpperCase()
+            );
+
             PermissionEntity entity = new PermissionEntity();
             entity.setName(name);
             permissionRepository.save(entity);
