@@ -3,12 +3,8 @@ package pl.rychellos.hotel.conversation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.conversation.dto.ConversationDTO;
 import pl.rychellos.hotel.lib.GenericMapper;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface ConversationMapper extends GenericMapper<ConversationEntity, ConversationDTO> {
