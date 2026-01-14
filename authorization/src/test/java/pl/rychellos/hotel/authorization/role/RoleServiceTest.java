@@ -56,7 +56,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     protected RoleEntity createEntity(Long id) {
         RoleEntity role = new RoleEntity();
         role.setId(id);
-        role.setName("ROLE_ADMIN");
+        role.setInternalName("ROLE_ADMIN");
         role.setDescription("Administrator role");
         role.setPermissions(new HashSet<>());
         role.setUsers(new HashSet<>());
@@ -67,7 +67,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     protected RoleDTO createDTO(Long id) {
         RoleDTO dto = new RoleDTO();
         dto.setId(id);
-        dto.setName("ROLE_ADMIN");
+        dto.setInternalName("ROLE_ADMIN");
         dto.setDescription("Administrator role");
         return dto;
     }

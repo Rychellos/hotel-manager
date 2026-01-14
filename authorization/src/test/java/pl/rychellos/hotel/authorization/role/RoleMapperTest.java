@@ -27,7 +27,7 @@ class RoleMapperTest {
 
         RoleEntity entity = new RoleEntity();
         entity.setId(10L);
-        entity.setName("ROLE_ADMIN");
+        entity.setInternalName("ROLE_ADMIN");
         entity.setPermissions(Set.of(perm1, perm2));
         entity.setUsers(Set.of(userEntity));
 
@@ -37,7 +37,7 @@ class RoleMapperTest {
         /// Then
         assertNotNull(dto);
         assertEquals(10L, dto.getId());
-        assertEquals("ROLE_ADMIN", dto.getName());
+        assertEquals("ROLE_ADMIN", dto.getInternalName());
 
         assertEquals(Set.of(1L, 2L), dto.getPermissionIds());
         assertEquals(Set.of(10L), dto.getUserIds());
@@ -48,7 +48,7 @@ class RoleMapperTest {
         /// Given
         RoleDTO dto = new RoleDTO();
         dto.setId(99L);
-        dto.setName("ROLE_ADMIN");
+        dto.setInternalName("ROLE_ADMIN");
         dto.setPermissionIds(Set.of(1L, 2L));
         dto.setUserIds(Set.of(10L, 20L));
 
@@ -58,7 +58,7 @@ class RoleMapperTest {
         /// THEN
         assertNotNull(entity);
         assertEquals(99L, entity.getId());
-        assertEquals("ROLE_ADMIN", entity.getName());
+        assertEquals("ROLE_ADMIN", entity.getInternalName());
 
         assertTrue(
             entity.getPermissions() == null || entity.getPermissions().isEmpty(),
@@ -81,19 +81,19 @@ class RoleMapperTest {
 
         RoleEntity entity = new RoleEntity();
         entity.setId(99L);
-        entity.setName("ROLE_ADMIN_OLD");
+        entity.setInternalName("ROLE_ADMIN_OLD");
         entity.setPermissions(Set.of(existingPermission));
         entity.setUsers(Set.of(existingUser));
 
         RoleDTO dto = new RoleDTO();
         dto.setId(99L);
-        dto.setName("ROLE_ADMIN_NEW");
+        dto.setInternalName("ROLE_ADMIN_NEW");
 
         /// WHEN
         mapper.updateEntityFromDTO(entity, dto);
 
         /// THEN
-        assertEquals("ROLE_ADMIN_NEW", dto.getName());
+        assertEquals("ROLE_ADMIN_NEW", dto.getInternalName());
 
         assertEquals(1, entity.getPermissions().size());
         assertTrue(entity.getPermissions().contains(existingPermission));

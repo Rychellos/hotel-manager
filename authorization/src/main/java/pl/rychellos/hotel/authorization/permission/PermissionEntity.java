@@ -1,6 +1,7 @@
 package pl.rychellos.hotel.authorization.permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
@@ -27,6 +28,7 @@ public class PermissionEntity implements BaseEntity {
     private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false, unique = true)
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     private String name;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)

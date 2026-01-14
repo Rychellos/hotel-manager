@@ -1,6 +1,7 @@
 package pl.rychellos.hotel.authorization.role;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
@@ -28,7 +29,9 @@ public class RoleEntity implements BaseEntity {
     private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false)
-    private String name;
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+    private String internalName;
+    private String publicName;
     private String description;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)

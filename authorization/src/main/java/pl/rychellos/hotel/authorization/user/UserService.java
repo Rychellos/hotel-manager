@@ -9,6 +9,11 @@ import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import pl.rychellos.hotel.authorization.permission.PermissionMapper;
+import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
+import pl.rychellos.hotel.authorization.role.RoleEntity;
+import pl.rychellos.hotel.authorization.role.RoleRepository;
+import pl.rychellos.hotel.authorization.role.RoleService;
 import pl.rychellos.hotel.authorization.user.dto.UserDTO;
 import pl.rychellos.hotel.authorization.user.dto.UserFilterDTO;
 import pl.rychellos.hotel.lib.GenericService;
@@ -16,7 +21,10 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,13 +34,29 @@ public class UserService extends GenericService<
     UserFilterDTO,
     UserRepository
     > implements UserDetailsPasswordService, UserDetailsService {
+    private final PermissionMapper permissionMapper;
+    private final RoleService roleService;
+    private final RoleRepository roleRepository;
+
     public UserService(
         UserRepository repository,
         UserMapper mapper,
         ApplicationExceptionFactory exceptionFactory,
         LangUtil langUtil,
-        ObjectMapper objectMapper) {
+        ObjectMapper objectMapper, PermissionMapper permissionMapper, RoleService roleService, RoleRepository roleRepository) {
         super(langUtil, UserDTO.class, mapper, repository, exceptionFactory, objectMapper);
+        this.permissionMapper = permissionMapper;
+        this.roleService = roleService;
+        this.roleRepository = roleRepository;
+    }
+
+    public List<PermissionDTO> getPermissions(Long id) {
+        return repository.findById(id).orElseThrow(() -> applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.user.notFound.byId", id.toString())
+            ))
+            .getRoles().stream().flatMap(role -> role.getPermissions().stream())
+            .map(permissionMapper::toDTO)
+            .collect(Collectors.toList());
     }
 
     private UserEntity updatePasswordInternal(String username, String newPassword) throws ApplicationException {
@@ -68,8 +92,7 @@ public class UserService extends GenericService<
         return this.updatePasswordInternal(user.getUsername(), newPassword);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+    private UserEntity fetchByUsername(String username) throws UsernameNotFoundException {
         if (username == null || username.isBlank()) {
             throw new UsernameNotFoundException(
                 langUtil.getMessage("error.user.username.empty"));
@@ -78,19 +101,42 @@ public class UserService extends GenericService<
         Optional<UserEntity> optionalUserEntity = this.repository.findByUsername(username);
 
         if (optionalUserEntity.isEmpty()) {
-            log.error("Tried to load user with username {}, but user with this username doesn't exist", username);
+            log.error("Tried to fetch user with username {}, but user with this username doesn't exist", username);
 
             throw new UsernameNotFoundException(
-                langUtil.getMessage("error.user.notFound.byUsername", username));
+                langUtil.getMessage("error.user.notFound.byUsername", username)
+            );
         }
-
-        log.info("Loaded user with username {}", username);
 
         return optionalUserEntity.get();
     }
 
+    public UserDTO getByUsername(String username) throws ApplicationException {
+        try {
+            return mapper.toDTO(fetchByUsername(username));
+        } catch (UsernameNotFoundException exception) {
+            throw applicationExceptionFactory.resourceNotFound(exception.getMessage());
+        }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
+        UserEntity user = fetchByUsername(username);
+
+        log.info("Loaded user with username {}", username);
+
+        return user;
+    }
+
     @Override
     protected void fetchRelations(UserEntity entity, UserDTO dto) {
-        throw new RuntimeException("Not yet implemented");
+        if (dto.getRoleIds() != null) {
+            if (dto.getRoleIds().isEmpty()) {
+                entity.getRoles().clear();
+            } else {
+                List<RoleEntity> roles = roleRepository.findAllById(dto.getRoleIds());
+                entity.setRoles(new HashSet<>(roles));
+            }
+        }
     }
 }

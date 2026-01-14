@@ -1,6 +1,5 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,6 +18,7 @@ import pl.rychellos.hotel.fault.FaultTypeService;
 import pl.rychellos.hotel.fault.dto.FaultTypeDTO;
 import pl.rychellos.hotel.fault.dto.FaultTypeFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -86,7 +86,7 @@ public class FaultTypeController extends GenericController<
     @Operation(summary = "Patch fault type")
     public ResponseEntity<FaultTypeDTO> patch(
         @PathVariable String idOrUuid,
-        @RequestBody JsonPatch patch) {
+        @RequestBody JSONPatchDTO patch) {
         return ResponseEntity.ok(super.patchOne(idOrUuid, patch));
     }
 

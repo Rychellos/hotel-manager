@@ -1,6 +1,5 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -86,7 +86,7 @@ public class RoomController extends GenericController<
     @Operation(summary = "Patch room")
     public ResponseEntity<RoomDTO> patch(
         @PathVariable String idOrUuid,
-        @RequestBody JsonPatch patch
+        @RequestBody JSONPatchDTO patch
     ) {
         return ResponseEntity.ok(super.patchOne(idOrUuid, patch));
     }

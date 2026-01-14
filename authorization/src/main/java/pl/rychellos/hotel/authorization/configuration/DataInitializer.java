@@ -33,14 +33,15 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
     public void checkAdminRole() {
         log.info("Checking if admin role exists...");
 
-        Optional<RoleEntity> adminRoleOptional = roleRepository.findByName("ROLE_ADMIN");
+        Optional<RoleEntity> adminRoleOptional = roleRepository.findByInternalName("ROLE_ADMIN");
         RoleEntity adminRole;
 
         if (adminRoleOptional.isEmpty()) {
             log.info("Admin role not found. Creating ROLE_ADMIN");
 
             RoleEntity role = new RoleEntity();
-            role.setName("ROLE_ADMIN");
+            role.setInternalName("ROLE_ADMIN");
+            role.setPublicName("Administrator");
             role.setDescription("Administrator role");
 
             adminRole = role;
@@ -71,7 +72,7 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
         if (userRepository.count() == 0) {
             log.info("User table is empty. Creating initial user");
 
-            Optional<RoleEntity> roleAdmin = roleRepository.findByName("ROLE_ADMIN");
+            Optional<RoleEntity> roleAdmin = roleRepository.findByInternalName("ROLE_ADMIN");
 
             if (roleAdmin.isEmpty()) {
                 log.warn("Could not find ROLE_ADMIN. Cannot create initial user without admin role. Aborting.");

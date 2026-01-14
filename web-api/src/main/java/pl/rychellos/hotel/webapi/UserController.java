@@ -1,6 +1,5 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +12,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
+import pl.rychellos.hotel.authorization.permission.PermissionService;
+import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
+import pl.rychellos.hotel.authorization.role.RoleService;
+import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
 import pl.rychellos.hotel.authorization.user.UserService;
@@ -20,10 +23,14 @@ import pl.rychellos.hotel.authorization.user.dto.UserCreateDTO;
 import pl.rychellos.hotel.authorization.user.dto.UserDTO;
 import pl.rychellos.hotel.authorization.user.dto.UserFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
+
+import java.security.Principal;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -36,12 +43,17 @@ public class UserController extends GenericController<
     UserRepository,
     UserService
     > {
+    private final RoleService roleService;
+    private final PermissionService permissionService;
+
     public UserController(
         UserService service,
         ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+        LangUtil langUtil,
+        RoleService roleService, PermissionService permissionService) {
         super(service, applicationExceptionFactory, langUtil);
+        this.roleService = roleService;
+        this.permissionService = permissionService;
     }
 
     @GetMapping
@@ -66,6 +78,24 @@ public class UserController extends GenericController<
         log.info("Loading detail about single user");
 
         return ResponseEntity.ok(super.getOne(idOrUuid));
+    }
+
+    @GetMapping("/{idOrUuid}/roles")
+    @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
+    @Operation(summary = "Fetch list of roles that single user have")
+    public ResponseEntity<List<RoleDTO>> getRolesById(@PathVariable String idOrUuid) {
+        log.info("Loading list of roles for single user");
+
+        return ResponseEntity.ok(super.getOne(idOrUuid).getRoleIds().stream().map(roleService::getById).toList());
+    }
+
+    @GetMapping("/{idOrUuid}/permissions")
+    @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
+    @Operation(summary = "Fetch list of permission that single user have")
+    public ResponseEntity<List<PermissionDTO>> getPermissionsById(@PathVariable String idOrUuid) {
+        log.info("Loading list of permissions for single user");
+
+        return ResponseEntity.ok(service.getPermissions(this.resolveId(idOrUuid)));
     }
 
     @PostMapping
@@ -100,7 +130,7 @@ public class UserController extends GenericController<
     @Operation(summary = "Updates user details")
     public ResponseEntity<UserDTO> patch(
         @PathVariable String idOrUuid,
-        @RequestBody JsonPatch userDTO
+        @RequestBody JSONPatchDTO userDTO
     ) {
         return ResponseEntity.ok(this.patchOne(idOrUuid, userDTO));
     }
@@ -111,5 +141,14 @@ public class UserController extends GenericController<
     public ResponseEntity<Void> delete(@PathVariable String idOrUuid) {
         this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/me")
+    @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.SELF)
+    @Operation(summary = "Fetches information about currently logged in user")
+    public ResponseEntity<UserDTO> me(
+        Principal principal
+    ) {
+        return ResponseEntity.ok(service.getByUsername(principal.getName()));
     }
 }

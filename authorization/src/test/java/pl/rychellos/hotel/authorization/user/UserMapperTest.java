@@ -18,9 +18,9 @@ class UserMapperTest {
         /// Given
         RoleEntity roleEntity1 = new RoleEntity();
         roleEntity1.setId(1L);
-        roleEntity1.setName("ROLE_1");
+        roleEntity1.setInternalName("ROLE_1");
         RoleEntity roleEntity2 = new RoleEntity();
-        roleEntity2.setName("ROLE_2");
+        roleEntity2.setInternalName("ROLE_2");
         roleEntity2.setId(2L);
 
         UserEntity entity = new UserEntity();
@@ -71,7 +71,7 @@ class UserMapperTest {
         /// Given
         RoleEntity existingRole = new RoleEntity();
         existingRole.setId(99L);
-        existingRole.setName("ROLE_1");
+        existingRole.setInternalName("ROLE_1");
 
         UserEntity entity = new UserEntity();
         entity.setId(30L);

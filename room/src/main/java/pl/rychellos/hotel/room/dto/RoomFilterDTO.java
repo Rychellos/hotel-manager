@@ -5,7 +5,7 @@ import pl.rychellos.hotel.lib.SearchFilter;
 
 @Data
 public class RoomFilterDTO {
-    @SearchFilter
+    @SearchFilter(path = "name", operator = SearchFilter.Operator.LIKE_IGNORE_CASE)
     private String name;
 
     @SearchFilter(path = "standard.id")

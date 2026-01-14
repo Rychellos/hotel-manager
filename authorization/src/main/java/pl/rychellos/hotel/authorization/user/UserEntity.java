@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.lib.BaseEntity;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class UserEntity implements UserDetails, BaseEntity {
     private String password;
 
     @Column(nullable = true)
-    private Boolean nextPasswordChange = null;
+    private LocalDate nextPasswordChange = null;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -51,7 +52,7 @@ public class UserEntity implements UserDetails, BaseEntity {
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = roles.stream()
-            .map(role -> new SimpleGrantedAuthority(role.getName()))
+            .map(role -> new SimpleGrantedAuthority(role.getInternalName()))
             .collect(Collectors.toSet());
 
         authorities.addAll(roles.stream()
