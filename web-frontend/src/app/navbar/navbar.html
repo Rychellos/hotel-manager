@@ -1,9 +1,0 @@
-<nav>
-    <ul>
-        @for (route of routes; track $index) {
-            <a [routerLink]="[route.path]" routerLinkActive="active">
-                {{ route.data.name }}
-            </a>
-        }
-    </ul>
-</nav>
