@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.authorization.service;
 
+import java.time.Duration;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,13 +18,9 @@ import pl.rychellos.hotel.authorization.token.RefreshTokenEntity;
 import pl.rychellos.hotel.authorization.token.RefreshTokenService;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.time.Duration;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthService {
@@ -54,7 +54,7 @@ public class AuthService {
         return user.filter(userEntity -> this.passwordEncoder.matches(password, userEntity.getPassword())).isPresent();
     }
 
-    public AuthResultDTO authenticate(AuthRequestDTO request) {
+    public AuthResultDTO authenticate(AuthRequestDTO request) throws ApplicationException {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -85,7 +85,7 @@ public class AuthService {
         return new AuthResponseDTO(jwtToken, roles, permissions);
     }
 
-    public AuthResultDTO refreshToken(String token) {
+    public AuthResultDTO refreshToken(String token) throws ApplicationException {
         RefreshTokenEntity refreshTokenEntity = refreshTokenService.findByToken(token);
         refreshTokenService.verifyExpiration(refreshTokenEntity);
 
@@ -101,7 +101,7 @@ public class AuthService {
         return new AuthResultDTO(authResponseDTO, token, user.getUsername());
     }
 
-    public void logout(String refreshToken) {
+    public void logout(String refreshToken) throws ApplicationException {
         refreshTokenService.revokeToken(refreshToken);
     }
 

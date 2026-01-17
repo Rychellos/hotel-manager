@@ -1,5 +1,12 @@
 package pl.rychellos.hotel.authorization.permission;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -8,15 +15,8 @@ import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.authorization.role.RoleRepository;
 import pl.rychellos.hotel.lib.testing.BaseServiceTest;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-class PermissionServiceTest extends BaseServiceTest<PermissionEntity, PermissionDTO, PermissionService, PermissionRepository> {
+class PermissionServiceTest
+        extends BaseServiceTest<PermissionEntity, PermissionDTO, PermissionService, PermissionRepository> {
     @Mock
     private PermissionMapper permissionMapper;
 
@@ -33,9 +33,8 @@ class PermissionServiceTest extends BaseServiceTest<PermissionEntity, Permission
         this.repository = permissionRepository;
 
         this.service = new PermissionService(
-            langUtil, permissionMapper, repository,
-            exceptionFactory, objectMapper, roleRepository
-        );
+                langUtil, permissionMapper, repository,
+                exceptionFactory, objectMapper, roleRepository);
     }
 
     @Override
@@ -56,7 +55,7 @@ class PermissionServiceTest extends BaseServiceTest<PermissionEntity, Permission
 
     /// Specific test for the logic unique to PermissionService
     @Test
-    void fetchRelations_ShouldSetRoles() {
+    void fetchRelations_ShouldSetRoles() throws Exception {
         /// Given
         PermissionEntity entity = new PermissionEntity();
         PermissionDTO dto = createDTO(1L);

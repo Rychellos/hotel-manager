@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.lib.lang;
 
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.MessageSource;
@@ -14,11 +18,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
 
 @Slf4j
 @Configuration

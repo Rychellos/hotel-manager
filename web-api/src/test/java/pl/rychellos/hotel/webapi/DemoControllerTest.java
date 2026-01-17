@@ -1,5 +1,11 @@
 package pl.rychellos.hotel.webapi;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,14 +17,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import pl.rychellos.hotel.room.RoomService;
 import pl.rychellos.hotel.room.StandardService;
 import pl.rychellos.hotel.room.dto.StandardDTO;
-
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class DemoControllerTest {

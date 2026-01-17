@@ -1,10 +1,9 @@
 package pl.rychellos.hotel.fault.dto;
 
-import lombok.Data;
-import pl.rychellos.hotel.lib.BaseDTO;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Data;
+import pl.rychellos.hotel.lib.BaseDTO;
 
 @Data
 public class FaultDTO implements BaseDTO {

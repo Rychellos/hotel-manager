@@ -1,9 +1,8 @@
 package pl.rychellos.hotel.lib;
 
 
-import lombok.Data;
-
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class JSONPatchDTO {

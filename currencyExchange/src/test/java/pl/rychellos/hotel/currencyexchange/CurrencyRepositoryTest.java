@@ -1,5 +1,11 @@
 package pl.rychellos.hotel.currencyexchange;
 
+import static junit.framework.TestCase.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.UUID;
 import junit.framework.TestCase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,13 +13,6 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
-import java.time.LocalDate;
-import java.util.Optional;
-import java.util.UUID;
-
-import static junit.framework.TestCase.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class CurrencyRepositoryTest {

@@ -1,14 +1,13 @@
 package pl.rychellos.hotel.authorization.role;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
 import pl.rychellos.hotel.authorization.user.UserEntity;
-
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RoleMapperTest {
     private final RoleMapper mapper = Mappers.getMapper(RoleMapper.class);

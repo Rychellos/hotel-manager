@@ -1,6 +1,8 @@
 package pl.rychellos.hotel.currencyexchange;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -12,9 +14,6 @@ import pl.rychellos.hotel.lib.GenericService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.time.LocalDate;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -93,7 +92,7 @@ public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO,
     }
 
     @Override
-    protected void fetchRelations(CurrencyEntity entity, CurrencyDTO dto) {
+    protected void fetchRelations(CurrencyEntity entity, CurrencyDTO dto) throws ApplicationException {
 
     }
 }

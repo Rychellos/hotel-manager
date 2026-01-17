@@ -1,9 +1,8 @@
 package pl.rychellos.hotel.fault.dto;
 
+import java.util.UUID;
 import lombok.Data;
 import pl.rychellos.hotel.lib.BaseDTO;
-
-import java.util.UUID;
 
 @Data
 public class FaultTypeDTO implements BaseDTO {

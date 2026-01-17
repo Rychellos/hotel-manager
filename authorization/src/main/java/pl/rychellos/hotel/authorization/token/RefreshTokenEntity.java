@@ -1,10 +1,9 @@
 package pl.rychellos.hotel.authorization.token;
 
 import jakarta.persistence.*;
+import java.time.Instant;
 import lombok.*;
 import pl.rychellos.hotel.authorization.user.UserEntity;
-
-import java.time.Instant;
 
 @Entity
 @Getter

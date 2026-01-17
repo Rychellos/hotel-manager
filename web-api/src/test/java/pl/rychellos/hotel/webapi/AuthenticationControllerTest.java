@@ -1,7 +1,13 @@
 package pl.rychellos.hotel.webapi;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,14 +25,6 @@ import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
 import pl.rychellos.hotel.authorization.user.UserService;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationControllerTest {

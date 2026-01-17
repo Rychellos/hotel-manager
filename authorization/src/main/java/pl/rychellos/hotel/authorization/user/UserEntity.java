@@ -1,18 +1,17 @@
 package pl.rychellos.hotel.authorization.user;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter

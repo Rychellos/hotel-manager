@@ -6,6 +6,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,12 +18,6 @@ import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Slf4j
 @Service

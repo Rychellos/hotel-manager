@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.lib.GenericController;
 import pl.rychellos.hotel.lib.JSONPatchDTO;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -28,18 +29,11 @@ import pl.rychellos.hotel.room.dto.RoomFilterDTO;
 @RestController
 @RequestMapping("/api/v1/rooms")
 @Tag(name = "Rooms", description = "Endpoints for managing rooms")
-public class RoomController extends GenericController<
-    RoomEntity,
-    RoomDTO,
-    RoomFilterDTO,
-    RoomRepository,
-    RoomService
-    > {
+public class RoomController extends GenericController<RoomEntity, RoomDTO, RoomFilterDTO, RoomRepository, RoomService> {
     public RoomController(
-        RoomService service,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+            RoomService service,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil) {
         super(service, applicationExceptionFactory, langUtil);
     }
 
@@ -48,26 +42,22 @@ public class RoomController extends GenericController<
     @CheckPermission(target = "ROOM", action = ActionType.READ, scope = ActionScope.PAGINATED)
     @Operation(summary = "Fetch all rooms paginated")
     public Page<RoomDTO> getRooms(
-        @Parameter(hidden = true)
-        @PageableDefault(size = 50)
-        Pageable pageable,
-        @ParameterObject
-        RoomFilterDTO filter
-    ) {
+            @Parameter(hidden = true) @PageableDefault(size = 50) Pageable pageable,
+            @ParameterObject RoomFilterDTO filter) throws ApplicationException {
         return super.getPage(pageable, filter);
     }
 
     @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "ROOM", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch single room by id or UUID")
-    public ResponseEntity<RoomDTO> getById(@PathVariable String idOrUuid) {
+    public ResponseEntity<RoomDTO> getById(@PathVariable String idOrUuid) throws ApplicationException {
         return ResponseEntity.ok(super.getOne(idOrUuid));
     }
 
     @PostMapping
     @CheckPermission(target = "ROOM", action = ActionType.CREATE, scope = ActionScope.ONE)
     @Operation(summary = "Create new room")
-    public ResponseEntity<RoomDTO> create(@RequestBody RoomDTO dto) {
+    public ResponseEntity<RoomDTO> create(@RequestBody RoomDTO dto) throws ApplicationException {
         return ResponseEntity.ok(super.createOne(dto));
     }
 
@@ -75,9 +65,8 @@ public class RoomController extends GenericController<
     @CheckPermission(target = "ROOM", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Update room")
     public ResponseEntity<RoomDTO> update(
-        @PathVariable String idOrUuid,
-        @RequestBody RoomDTO dto
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody RoomDTO dto) throws ApplicationException {
         return ResponseEntity.ok(super.putOne(idOrUuid, dto));
     }
 
@@ -85,16 +74,15 @@ public class RoomController extends GenericController<
     @CheckPermission(target = "ROOM", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Patch room")
     public ResponseEntity<RoomDTO> patch(
-        @PathVariable String idOrUuid,
-        @RequestBody JSONPatchDTO patch
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody JSONPatchDTO patch) throws ApplicationException {
         return ResponseEntity.ok(super.patchOne(idOrUuid, patch));
     }
 
     @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "ROOM", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Delete room")
-    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) {
+    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) throws ApplicationException {
         super.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }

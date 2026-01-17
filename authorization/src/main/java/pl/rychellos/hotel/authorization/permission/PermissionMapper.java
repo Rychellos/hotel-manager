@@ -1,5 +1,7 @@
 package pl.rychellos.hotel.authorization.permission;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -7,9 +9,6 @@ import org.mapstruct.ReportingPolicy;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.lib.GenericMapper;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(
     componentModel = "spring",
@@ -21,7 +20,7 @@ public interface PermissionMapper extends GenericMapper<PermissionEntity, Permis
 
     @Mapping(target = "roleIds", source = "roles")
     PermissionDTO toDTO(PermissionEntity entity);
-    
+
     @Mapping(target = "roles", ignore = true)
     void updateEntityFromDTO(@MappingTarget PermissionEntity entity, PermissionDTO dto);
 

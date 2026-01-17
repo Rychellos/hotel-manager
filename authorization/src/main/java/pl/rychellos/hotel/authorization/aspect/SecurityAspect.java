@@ -27,7 +27,7 @@ public class SecurityAspect {
             log.info("No authentication context. Aborting");
             throw new AccessDeniedException("No authentication found");
         }
-        
+
         boolean hasPermission = permissionEvaluator.hasPermission(
             authentication,
             checkPermission.target(),

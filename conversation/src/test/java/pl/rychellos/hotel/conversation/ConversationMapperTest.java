@@ -1,16 +1,14 @@
 package pl.rychellos.hotel.conversation;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.conversation.dto.ConversationDTO;
-
-import java.util.Collections;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = { ConversationMapperImpl.class })
 class ConversationMapperTest {

@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.authorization.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +15,6 @@ import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
@@ -40,7 +40,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void generateToken_ShouldCreateValidJwt() {
+    void generateToken_ShouldCreateValidJwt() throws ApplicationException {
         // When
         String token = jwtService.generateToken(user);
 
@@ -50,7 +50,7 @@ class JwtServiceTest {
     }
 
     @Test
-    void isTokenValid_ShouldReturnTrue_ForCorrectUser() {
+    void isTokenValid_ShouldReturnTrue_ForCorrectUser() throws ApplicationException {
         // Given
         String token = jwtService.generateToken(user);
 

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
+import java.util.Collection;
+import java.util.UUID;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +16,8 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-import java.util.Collection;
-import java.util.UUID;
-
-public abstract class GenericService<
-    Entity extends BaseEntity,
-    DTO extends BaseDTO,
-    Filter,
-    Repository extends GenericRepository<Entity>
-    > implements IGenericService<Entity, DTO, Filter> {
+public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>>
+        implements IGenericService<Entity, DTO, Filter> {
     private final EntitySpecificationBuilder<Entity> specification = new EntitySpecificationBuilder<>();
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
@@ -33,13 +28,12 @@ public abstract class GenericService<
     protected final ApplicationExceptionFactory applicationExceptionFactory;
 
     protected GenericService(
-        LangUtil langUtil,
-        Class<DTO> clazz,
-        GenericMapper<Entity, DTO> mapper,
-        Repository repository,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        ObjectMapper objectMapper
-    ) {
+            LangUtil langUtil,
+            Class<DTO> clazz,
+            GenericMapper<Entity, DTO> mapper,
+            Repository repository,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            ObjectMapper objectMapper) {
         this.langUtil = langUtil;
         this.repository = repository;
         this.mapper = mapper;
@@ -48,13 +42,13 @@ public abstract class GenericService<
         this.objectMapper = objectMapper;
     }
 
-    protected abstract void fetchRelations(Entity entity, DTO dto);
+    protected abstract void fetchRelations(Entity entity, DTO dto) throws ApplicationException;
 
     protected Specification<Entity> createSpecification(Filter currencyDTOFilter) {
         return specification.build(currencyDTOFilter);
     }
 
-    public Page<DTO> getAllPaginated(Pageable pageable, Filter filter) {
+    public Page<DTO> getAllPaginated(Pageable pageable, Filter filter) throws ApplicationException {
         try {
             return repository.findAll(createSpecification(filter), pageable).map(mapper::toDTO);
         } catch (InvalidDataAccessApiUsageException exception) {
@@ -62,7 +56,7 @@ public abstract class GenericService<
         }
     }
 
-    public Collection<DTO> getAll(Filter filter) {
+    public Collection<DTO> getAll(Filter filter) throws ApplicationException {
         try {
             return repository.findAll(createSpecification(filter)).stream().map(mapper::toDTO).toList();
         } catch (InvalidDataAccessApiUsageException exception) {
@@ -72,17 +66,15 @@ public abstract class GenericService<
 
     public DTO getById(long id) throws ApplicationException {
         return mapper.toDTO(repository.findById(id).orElseThrow(() -> applicationExceptionFactory.resourceNotFound(
-            langUtil.getMessage("error.generic.notFoundById.message")
-                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
+                langUtil.getMessage("error.generic.notFoundById.message")
+                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
     }
 
     public DTO getByPublicId(UUID publicId) throws ApplicationException {
         return mapper.toDTO(repository.findByPublicId(publicId).orElseThrow(
-            () -> applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.generic.notFoundByPublicId.message")
-                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), publicId)
-            )
-        ));
+                () -> applicationExceptionFactory.resourceNotFound(
+                        langUtil.getMessage("error.generic.notFoundByPublicId.message")
+                                .formatted(StringUtils.capitalize(clazz.getSimpleName()), publicId))));
     }
 
     public boolean exists(long id) {
@@ -93,7 +85,7 @@ public abstract class GenericService<
         return repository.existsByPublicId(publicId);
     }
 
-    public DTO save(DTO dto) {
+    public DTO save(DTO dto) throws ApplicationException {
         Entity entity = mapper.toEntity(dto);
 
         if (entity.getPublicId() == null) {
@@ -115,11 +107,9 @@ public abstract class GenericService<
 
     public DTO update(long id, DTO dto) throws ApplicationException {
         Entity entity = repository.findById(id).orElseThrow(
-            () -> applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.generic.notFoundById.message")
-                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)
-            )
-        );
+                () -> applicationExceptionFactory.resourceNotFound(
+                        langUtil.getMessage("error.generic.notFoundById.message")
+                                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)));
 
         mapper.updateEntityFromDTO(entity, dto);
 
@@ -145,7 +135,7 @@ public abstract class GenericService<
         }
     }
 
-    public void delete(long id) {
+    public void delete(long id) throws ApplicationException {
         if (exists(id)) {
             repository.deleteById(id);
 
@@ -153,7 +143,7 @@ public abstract class GenericService<
         }
 
         throw applicationExceptionFactory.methodNotAllowed(
-            langUtil.getMessage("error.generic.notFoundById.message")
-                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id));
+                langUtil.getMessage("error.generic.notFoundById.message")
+                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id));
     }
 }

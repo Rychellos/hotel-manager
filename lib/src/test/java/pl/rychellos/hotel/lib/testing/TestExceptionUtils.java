@@ -1,10 +1,10 @@
 package pl.rychellos.hotel.lib.testing;
 
+import static org.mockito.ArgumentMatchers.anyString;
+
 import org.mockito.Mockito;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import static org.mockito.ArgumentMatchers.anyString;
 
 public class TestExceptionUtils {
     public static ApplicationExceptionFactory createFakeFactory() {

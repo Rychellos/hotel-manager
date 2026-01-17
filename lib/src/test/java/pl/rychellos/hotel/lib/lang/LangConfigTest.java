@@ -1,13 +1,12 @@
 package pl.rychellos.hotel.lib.lang;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LangConfigTest {
 

@@ -1,14 +1,13 @@
 package pl.rychellos.hotel.room;
 
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import pl.rychellos.hotel.room.dto.StandardDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import pl.rychellos.hotel.room.dto.StandardDTO;
 
 class StandardMapperTest {
 

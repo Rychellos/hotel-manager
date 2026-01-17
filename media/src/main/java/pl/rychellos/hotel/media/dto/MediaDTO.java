@@ -1,10 +1,9 @@
 package pl.rychellos.hotel.media.dto;
 
+import java.util.UUID;
 import lombok.Data;
 import pl.rychellos.hotel.lib.BaseDTO;
 import pl.rychellos.hotel.media.MediaType;
-
-import java.util.UUID;
 
 @Data
 public class MediaDTO implements BaseDTO {

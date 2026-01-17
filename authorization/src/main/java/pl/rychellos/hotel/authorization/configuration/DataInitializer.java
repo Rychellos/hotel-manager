@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.authorization.configuration;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -14,11 +18,6 @@ import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.authorization.role.RoleRepository;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @Component

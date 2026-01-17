@@ -3,14 +3,13 @@ package pl.rychellos.hotel.authorization.role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import lombok.*;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Getter

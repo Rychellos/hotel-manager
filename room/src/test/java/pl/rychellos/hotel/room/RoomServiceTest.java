@@ -1,6 +1,9 @@
 package pl.rychellos.hotel.room;
 
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,10 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.room.dto.RoomDTO;
-
-import java.util.Optional;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoomServiceTest {
@@ -39,7 +38,7 @@ class RoomServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldSetStandard_WhenStandardIdIsPresent() {
+    void fetchRelations_ShouldSetStandard_WhenStandardIdIsPresent() throws Exception {
         // Given
         RoomDTO dto = new RoomDTO();
         dto.setStandardId(1L);
@@ -57,7 +56,7 @@ class RoomServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldNotSetStandard_WhenStandardIdIsMissing() {
+    void fetchRelations_ShouldNotSetStandard_WhenStandardIdIsMissing() throws Exception {
         // Given
         RoomDTO dto = new RoomDTO();
         RoomEntity entity = new RoomEntity();

@@ -1,14 +1,13 @@
 package pl.rychellos.hotel.authorization.user;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.authorization.user.dto.UserDTO;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class UserMapperTest {
     private final UserMapper mapper = Mappers.getMapper(UserMapper.class);

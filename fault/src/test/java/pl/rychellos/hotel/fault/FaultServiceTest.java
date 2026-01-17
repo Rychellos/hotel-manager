@@ -1,6 +1,9 @@
 package pl.rychellos.hotel.fault;
 
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,10 +14,6 @@ import pl.rychellos.hotel.conversation.ConversationRepository;
 import pl.rychellos.hotel.fault.dto.FaultDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.util.Optional;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FaultServiceTest {
@@ -44,7 +43,7 @@ class FaultServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldSetFaultTypeAndConversation_WhenIdsPresent() {
+    void fetchRelations_ShouldSetFaultTypeAndConversation_WhenIdsPresent() throws Exception {
         // Given
         FaultDTO dto = new FaultDTO();
         dto.setFaultTypeId(1L);

@@ -14,6 +14,7 @@ import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
 import pl.rychellos.hotel.lib.JSONPatchDTO;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -22,18 +23,12 @@ import pl.rychellos.hotel.lib.security.ActionType;
 @RestController
 @RequestMapping("/api/v1/permissions")
 @Tag(name = "Permission", description = "Endpoints for managing permissions")
-public class PermissionController extends GenericController<
-    PermissionEntity,
-    PermissionDTO,
-    PermissionFilterDTO,
-    PermissionRepository,
-    PermissionService
-    > {
+public class PermissionController extends
+        GenericController<PermissionEntity, PermissionDTO, PermissionFilterDTO, PermissionRepository, PermissionService> {
     protected PermissionController(
-        PermissionService service,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+            PermissionService service,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil) {
         super(service, applicationExceptionFactory, langUtil);
     }
 
@@ -41,22 +36,22 @@ public class PermissionController extends GenericController<
     @CheckPermission(target = "PERMISSION", action = ActionType.READ, scope = ActionScope.PAGINATED)
     @Operation(summary = "Fetch details of all permissions present")
     public Page<PermissionDTO> getAll(
-        Pageable pageable,
-        PermissionFilterDTO filter) {
+            Pageable pageable,
+            PermissionFilterDTO filter) throws ApplicationException {
         return super.getPage(pageable, filter);
     }
 
     @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "PERMISSION", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch details about single permission by id or UUID")
-    public PermissionDTO getById(@PathVariable String idOrUuid) {
+    public PermissionDTO getById(@PathVariable String idOrUuid) throws ApplicationException {
         return super.getOne(idOrUuid);
     }
 
     @PostMapping
     @CheckPermission(target = "PERMISSION", action = ActionType.CREATE, scope = ActionScope.ONE)
     @Operation(summary = "Create new permission")
-    public ResponseEntity<PermissionDTO> create(PermissionDTO permissionDTO) {
+    public ResponseEntity<PermissionDTO> create(PermissionDTO permissionDTO) throws ApplicationException {
         return ResponseEntity.ok(this.createOne(permissionDTO));
     }
 
@@ -64,9 +59,8 @@ public class PermissionController extends GenericController<
     @CheckPermission(target = "PERMISSION", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Sets permission's details")
     public ResponseEntity<PermissionDTO> put(
-        @PathVariable String idOrUuid,
-        @RequestBody PermissionDTO permissionDTO
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody PermissionDTO permissionDTO) throws ApplicationException {
         return ResponseEntity.ok(this.putOne(idOrUuid, permissionDTO));
     }
 
@@ -74,9 +68,8 @@ public class PermissionController extends GenericController<
     @CheckPermission(target = "PERMISSION", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Updates permission's details")
     public ResponseEntity<PermissionDTO> patch(
-        @PathVariable String idOrUuid,
-        @RequestBody JSONPatchDTO permissionDTO
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody JSONPatchDTO permissionDTO) throws ApplicationException {
         return ResponseEntity.ok(this.patchOne(idOrUuid, permissionDTO));
     }
 
@@ -84,8 +77,7 @@ public class PermissionController extends GenericController<
     @CheckPermission(target = "PERMISSION", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Deletes permission")
     public ResponseEntity<Void> delete(
-        @PathVariable String idOrUuid
-    ) {
+            @PathVariable String idOrUuid) throws ApplicationException {
         this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }

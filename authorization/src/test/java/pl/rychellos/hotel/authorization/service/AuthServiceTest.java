@@ -1,29 +1,28 @@
 package pl.rychellos.hotel.authorization.service;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.http.ResponseCookie;
-import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
-import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
-import pl.rychellos.hotel.authorization.token.RefreshTokenEntity;
-import pl.rychellos.hotel.authorization.token.RefreshTokenService;
-import pl.rychellos.hotel.authorization.user.UserEntity;
-import pl.rychellos.hotel.authorization.user.UserRepository;
-
-import java.util.Optional;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import pl.rychellos.hotel.authorization.service.dto.AuthRequestDTO;
+import pl.rychellos.hotel.authorization.service.dto.AuthResultDTO;
+import pl.rychellos.hotel.authorization.token.RefreshTokenEntity;
+import pl.rychellos.hotel.authorization.token.RefreshTokenService;
+import pl.rychellos.hotel.authorization.user.UserEntity;
+import pl.rychellos.hotel.authorization.user.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -41,7 +40,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Test
-    void login_ShouldReturnAuthResult_WhenCredentialsCorrect() {
+    void login_ShouldReturnAuthResult_WhenCredentialsCorrect() throws Exception {
         // Given
         AuthRequestDTO request = new AuthRequestDTO("user", "pass");
         UserEntity user = new UserEntity();
@@ -66,7 +65,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void refreshToken_ShouldRotateAndReturnNewResult() {
+    void refreshToken_ShouldRotateAndReturnNewResult() throws Exception {
         // Given
         String oldRefreshToken = "old-hash";
         UserEntity user = new UserEntity();
@@ -89,7 +88,7 @@ class AuthServiceTest {
     }
 
     @Test
-    void logout_ShouldInvokeRevocation() {
+    void logout_ShouldInvokeRevocation() throws Exception {
         // When
         authService.logout("token-to-revoke");
 
