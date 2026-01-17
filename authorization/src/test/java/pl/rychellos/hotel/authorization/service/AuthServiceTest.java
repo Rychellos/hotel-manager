@@ -107,7 +107,7 @@ class AuthServiceTest {
         assertEquals("refresh_token", cookie.getName());
         assertEquals("token-value", cookie.getValue());
         assertTrue(cookie.isHttpOnly());
-        assertEquals("/", cookie.getPath());
+        assertEquals("/api/", cookie.getPath());
         assertEquals(7 * 24 * 60 * 60, cookie.getMaxAge().getSeconds());
     }
 
@@ -121,7 +121,7 @@ class AuthServiceTest {
         assertEquals("refresh_token", cookie.getName());
         assertTrue(cookie.getValue() == null || cookie.getValue().isEmpty());
         assertTrue(cookie.isHttpOnly());
-        assertEquals("/", cookie.getPath());
+        assertEquals("/api/", cookie.getPath());
         assertEquals(0, cookie.getMaxAge().getSeconds());
     }
 }
