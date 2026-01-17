@@ -5,6 +5,6 @@ import pl.rychellos.hotel.lib.SearchFilter;
 
 @Data
 public class StandardFilterDTO {
-    @SearchFilter
+    @SearchFilter(path = "name", operator = SearchFilter.Operator.LIKE_IGNORE_CASE)
     private String name;
 }

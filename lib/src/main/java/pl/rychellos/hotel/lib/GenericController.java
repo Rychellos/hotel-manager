@@ -1,11 +1,14 @@
 package pl.rychellos.hotel.lib;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public abstract class GenericController<
@@ -29,7 +32,8 @@ public abstract class GenericController<
         this.langUtil = langUtil;
     }
 
-    protected long resolveId(String idOrUuid) {
+
+    public long resolveId(String idOrUuid) {
         try {
             return Long.parseLong(idOrUuid);
         } catch (NumberFormatException e) {
@@ -46,7 +50,8 @@ public abstract class GenericController<
     }
 
     // GET - fetch page
-    protected Page<DTO> getPage(
+
+    public Page<DTO> getPage(
         Pageable pageable,
         Filter filter
     ) {
@@ -54,52 +59,69 @@ public abstract class GenericController<
     }
 
     // GET - fetch one
-    protected DTO getOne(long id) {
+
+    public DTO getOne(long id) {
         return service.getById(id);
     }
 
-    protected DTO getOne(UUID publicId) {
+
+    public DTO getOne(UUID publicId) {
         return service.getByPublicId(publicId);
     }
 
-    protected DTO getOne(String idOrUuid) {
+
+    public DTO getOne(String idOrUuid) {
         return getOne(resolveId(idOrUuid));
     }
 
     // POST - create one
-    protected DTO createOne(DTO dto) {
+
+    public DTO createOne(DTO dto) {
         return service.saveIfNotExists(dto);
     }
 
     // PUT - update or create one
-    protected DTO putOne(DTO dto) {
+
+    public DTO putOne(DTO dto) {
         return service.save(dto);
     }
 
-    protected DTO putOne(String idOrUuid, DTO dto) {
+
+    public DTO putOne(String idOrUuid, DTO dto) {
         dto.setId(resolveId(idOrUuid));
         return putOne(dto);
     }
 
     // PATCH - partial update if exists
-    protected DTO patchOne(long id, JsonPatch patch) {
-        return service.patch(id, patch);
+    public DTO patchOne(long id, JSONPatchDTO patch) {
+        return service.patch(id, toProperPatch(patch));
     }
 
-    protected DTO patchOne(String idOrUuid, JsonPatch patch) {
+    public DTO patchOne(String idOrUuid, JSONPatchDTO patch) {
         return patchOne(resolveId(idOrUuid), patch);
     }
 
     // DELETE
-    protected void deleteOne(long id) {
+    public void deleteOne(long id) {
         service.delete(id);
     }
 
-    protected void deleteOne(UUID publicId) {
+    public void deleteOne(UUID publicId) {
         deleteOne(getOne(publicId).getId());
     }
 
-    protected void deleteOne(String idOrUuid) {
+    public void deleteOne(String idOrUuid) {
         deleteOne(resolveId(idOrUuid));
+    }
+
+    private JsonPatch toProperPatch(JSONPatchDTO dto) {
+        try {
+            // TODO: Move out
+            JsonNode node = new ObjectMapper().valueToTree(dto.getBody());
+
+            return JsonPatch.fromJson(node);
+        } catch (IOException e) {
+            throw applicationExceptionFactory.badRequest(langUtil.getMessage("error.generic.invalidJSONPatch.message"));
+        }
     }
 }

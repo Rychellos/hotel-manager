@@ -8,8 +8,9 @@ import pl.rychellos.hotel.room.dto.RoomDTO;
 
 @Mapper(componentModel = "spring", uses = {StandardMapper.class})
 public interface RoomMapper extends GenericMapper<RoomEntity, RoomDTO> {
+    @Mapping(target = "standardId", source = "standard.id")
+    RoomDTO toDTO(RoomEntity entity);
 
-    @Mapping(target = "standard", ignore = true)
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(@MappingTarget RoomEntity entity, RoomDTO dto);
 }

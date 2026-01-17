@@ -1,6 +1,5 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +21,7 @@ import pl.rychellos.hotel.conversation.dto.ConversationFilterDTO;
 import pl.rychellos.hotel.conversation.dto.MessageDTO;
 import pl.rychellos.hotel.conversation.dto.MessageFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -103,7 +103,7 @@ public class ConversationController extends GenericController<
         @PathVariable
         String idOrUuid,
         @RequestBody
-        JsonPatch patch
+        JSONPatchDTO patch
     ) {
         return ResponseEntity.ok(super.patchOne(idOrUuid, patch));
     }

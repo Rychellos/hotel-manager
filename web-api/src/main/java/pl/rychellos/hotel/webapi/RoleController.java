@@ -1,27 +1,36 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springdoc.core.converters.models.PageableAsQueryParam;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
+import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
 import pl.rychellos.hotel.authorization.role.RoleRepository;
 import pl.rychellos.hotel.authorization.role.RoleService;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
 import pl.rychellos.hotel.authorization.role.dto.RoleFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/roles")
 @Tag(name = "Roles", description = "Endpoints for managing roles")
+@Slf4j
 public class RoleController extends GenericController<
     RoleEntity,
     RoleDTO,
@@ -39,9 +48,16 @@ public class RoleController extends GenericController<
     }
 
     @GetMapping
+    @PageableAsQueryParam
     @CheckPermission(target = "ROLE", action = ActionType.READ, scope = ActionScope.PAGINATED)
     @Operation(summary = "Fetch details of all roles present")
-    public Page<RoleDTO> getAll(Pageable pageable, RoleFilterDTO filter) {
+    public Page<RoleDTO> getAll(
+        @Parameter(hidden = true)
+        @PageableDefault(size = 50)
+        Pageable pageable,
+        @ParameterObject
+        RoleFilterDTO filter
+    ) {
         return getPage(pageable, filter);
     }
 
@@ -50,6 +66,15 @@ public class RoleController extends GenericController<
     @Operation(summary = "Fetch details about single role by id or UUID")
     public RoleDTO getById(@PathVariable String idOrUuid) {
         return getOne(idOrUuid);
+    }
+
+    @GetMapping("/{idOrUuid}/permissions")
+    @CheckPermission(target = "ROLE", action = ActionType.READ, scope = ActionScope.ONE)
+    @Operation(summary = "Fetch list of permission for single role")
+    public ResponseEntity<List<PermissionDTO>> getPermissionsById(@PathVariable String idOrUuid) {
+        log.info("Loading list of permissions for single role");
+
+        return ResponseEntity.ok(service.getPermissions(this.resolveId(idOrUuid)));
     }
 
     @PostMapping
@@ -74,9 +99,10 @@ public class RoleController extends GenericController<
     @Operation(summary = "Updates role's details")
     public ResponseEntity<RoleDTO> patch(
         @PathVariable String idOrUuid,
-        @RequestBody JsonPatch roleDTO
+        @RequestBody JSONPatchDTO patchDTO
     ) {
-        return ResponseEntity.ok(this.patchOne(idOrUuid, roleDTO));
+        log.info("Patching role with id: {}", idOrUuid);
+        return ResponseEntity.ok(this.patchOne(idOrUuid, patchDTO));
     }
 
     @DeleteMapping("/{idOrUuid}")

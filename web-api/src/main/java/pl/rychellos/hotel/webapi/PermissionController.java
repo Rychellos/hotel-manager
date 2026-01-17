@@ -1,6 +1,5 @@
 package pl.rychellos.hotel.webapi;
 
-import com.github.fge.jsonpatch.JsonPatch;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
@@ -14,6 +13,7 @@ import pl.rychellos.hotel.authorization.permission.PermissionService;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
+import pl.rychellos.hotel.lib.JSONPatchDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -75,7 +75,7 @@ public class PermissionController extends GenericController<
     @Operation(summary = "Updates permission's details")
     public ResponseEntity<PermissionDTO> patch(
         @PathVariable String idOrUuid,
-        @RequestBody JsonPatch permissionDTO
+        @RequestBody JSONPatchDTO permissionDTO
     ) {
         return ResponseEntity.ok(this.patchOne(idOrUuid, permissionDTO));
     }

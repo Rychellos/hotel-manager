@@ -15,6 +15,7 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 import java.util.Collection;
+import java.util.UUID;
 
 public abstract class GenericService<
     Entity extends BaseEntity,
@@ -75,7 +76,7 @@ public abstract class GenericService<
                 .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
     }
 
-    public DTO getByPublicId(java.util.UUID publicId) throws ApplicationException {
+    public DTO getByPublicId(UUID publicId) throws ApplicationException {
         return mapper.toDTO(repository.findByPublicId(publicId).orElseThrow(
             () -> applicationExceptionFactory.resourceNotFound(
                 langUtil.getMessage("error.generic.notFoundByPublicId.message")
@@ -88,7 +89,7 @@ public abstract class GenericService<
         return repository.existsById(id);
     }
 
-    public boolean existsByPublicId(java.util.UUID publicId) {
+    public boolean existsByPublicId(UUID publicId) {
         return repository.existsByPublicId(publicId);
     }
 
@@ -96,7 +97,7 @@ public abstract class GenericService<
         Entity entity = mapper.toEntity(dto);
 
         if (entity.getPublicId() == null) {
-            entity.getPublicId();
+            entity.setPublicId(UUID.randomUUID());
         }
 
         fetchRelations(entity, dto);

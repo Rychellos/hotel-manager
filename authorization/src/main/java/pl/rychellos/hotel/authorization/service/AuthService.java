@@ -78,7 +78,7 @@ public class AuthService {
 
     private AuthResponseDTO buildAuthResponse(UserEntity user, String jwtToken) {
         Set<String> roles = user.getRoles().stream()
-            .map(RoleEntity::getName)
+            .map(RoleEntity::getInternalName)
             .collect(Collectors.toSet());
 
         Set<String> permissions = user.getRoles().stream()
@@ -113,7 +113,7 @@ public class AuthService {
         return ResponseCookie.from("refresh_token", refreshToken)
             .httpOnly(true)
             .secure(false)
-            .path("/")
+            .path("/api/")
             .maxAge(Duration.ofDays(7))
             .build();
     }
@@ -122,7 +122,7 @@ public class AuthService {
         return ResponseCookie.from("refresh_token", "")
             .httpOnly(true)
             .secure(false)
-            .path("/")
+            .path("/api/")
             .maxAge(0)
             .build();
     }

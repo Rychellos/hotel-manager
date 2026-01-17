@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.lib.BaseEntity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Data
@@ -19,7 +20,7 @@ public class RoomEntity implements BaseEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private java.util.UUID publicId = java.util.UUID.randomUUID();
+    private UUID publicId = UUID.randomUUID();
 
     @Column(nullable = false)
     private String name;

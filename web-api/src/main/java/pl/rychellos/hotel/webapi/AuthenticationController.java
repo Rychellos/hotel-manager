@@ -3,6 +3,7 @@ package pl.rychellos.hotel.webapi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
@@ -104,10 +105,27 @@ public class AuthenticationController {
 
     @PostMapping("/refresh")
     @Operation(summary = "Refreshes token located inside cookie and returns new login response.")
-    public ResponseEntity<AuthResponseDTO> refresh(
+    @ApiResponse(
+        responseCode = "200",
+        content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))
+    )
+    public ResponseEntity<?> refresh(
         @CookieValue(name = "refresh_token") String refreshToken
     ) {
-        AuthResultDTO result = authService.refreshToken(refreshToken);
+        AuthResultDTO result;
+        try {
+            result = authService.refreshToken(refreshToken);
+        } catch (ApplicationException exception) {
+            ResponseCookie cookie = authService.createLogoutCookie();
+
+            log.info("{}: {}", exception.getTitle(), exception.getDetail());
+
+            return ResponseEntity
+                .status(exception.getStatus())
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(exception.getProblemDetail());
+        }
+
         ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
 
         log.info("User with username {} refreshed token", result.username());

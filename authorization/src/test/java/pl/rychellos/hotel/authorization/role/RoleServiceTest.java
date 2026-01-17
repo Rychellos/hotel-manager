@@ -3,6 +3,7 @@ package pl.rychellos.hotel.authorization.role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import pl.rychellos.hotel.authorization.permission.PermissionMapper;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.permission.PermissionRepository;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
@@ -33,6 +34,9 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PermissionMapper permissionMapper;
+
     @BeforeEach
     void setUp() {
         /// We link our specific mock to the generic parent field
@@ -40,23 +44,24 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
 
         this.repository = roleRepository;
 
-        /// Initialize service with generic mocks from the parent and specific mocks from here
+        /// Initialize service with generic mocks from the parent and specific mocks
+        /// from here
         this.service = new RoleService(
-            repository,
-            roleMapper,
-            exceptionFactory,
-            langUtil,
-            objectMapper,
-            permissionRepository,
-            userRepository
-        );
+                repository,
+                roleMapper,
+                exceptionFactory,
+                langUtil,
+                objectMapper,
+                permissionRepository,
+                userRepository,
+                permissionMapper);
     }
 
     @Override
     protected RoleEntity createEntity(Long id) {
         RoleEntity role = new RoleEntity();
         role.setId(id);
-        role.setName("ROLE_ADMIN");
+        role.setInternalName("ROLE_ADMIN");
         role.setDescription("Administrator role");
         role.setPermissions(new HashSet<>());
         role.setUsers(new HashSet<>());
@@ -67,7 +72,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     protected RoleDTO createDTO(Long id) {
         RoleDTO dto = new RoleDTO();
         dto.setId(id);
-        dto.setName("ROLE_ADMIN");
+        dto.setInternalName("ROLE_ADMIN");
         dto.setDescription("Administrator role");
         return dto;
     }
