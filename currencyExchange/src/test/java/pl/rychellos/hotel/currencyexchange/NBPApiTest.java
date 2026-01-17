@@ -29,7 +29,8 @@ class NBPApiTest {
         /// Given
         String currencyCode = "usd";
         CurrencyRateDTO rate = new CurrencyRateDTO("064/A/NBP/2016", LocalDate.of(2016, 4, 4), 3.7254);
-        CurrencyFetchDTO expectedFetch = new CurrencyFetchDTO("A", "dolar amerykański", "USD", new ArrayList<>(List.of(rate)));
+        CurrencyFetchDTO expectedFetch = new CurrencyFetchDTO("A", "dolar amerykański", "USD",
+                new ArrayList<>(List.of(rate)));
 
         /// When
         when(nbpApi.getRate(currencyCode)).thenReturn(expectedFetch);
@@ -37,8 +38,8 @@ class NBPApiTest {
         CurrencyFetchDTO result = nbpApi.getRate(currencyCode);
 
         /// Then
-        assertEquals("USD", result.code());
-        assertEquals(1, result.rates().size());
+        assertEquals("USD", result.getCode());
+        assertEquals(1, result.getRates().size());
         verify(nbpApi).getRate(currencyCode);
     }
 
@@ -49,7 +50,7 @@ class NBPApiTest {
 
         /// When
         when(nbpApi.getRate(currencyCode))
-            .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+                .thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
         /// Then
         assertThrows(HttpClientErrorException.class, () -> {

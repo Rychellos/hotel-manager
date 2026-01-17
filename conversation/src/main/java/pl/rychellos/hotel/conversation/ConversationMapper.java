@@ -12,10 +12,13 @@ public interface ConversationMapper extends GenericMapper<ConversationEntity, Co
     @Mapping(target = "participantIds", expression = "java(mapEntitiesToIds(entity.getParticipants()))")
     ConversationDTO toDTO(ConversationEntity entity);
 
+    @Override
     @Mapping(target = "participants", ignore = true)
+    @Mapping(target = "messages", ignore = true)
     ConversationEntity toEntity(ConversationDTO dto);
 
     @Mapping(target = "participants", ignore = true)
+    @Mapping(target = "messages", ignore = true)
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDTO(@MappingTarget ConversationEntity entity, ConversationDTO dto);
 }

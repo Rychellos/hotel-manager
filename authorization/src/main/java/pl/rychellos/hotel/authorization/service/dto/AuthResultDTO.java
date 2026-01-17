@@ -1,8 +1,16 @@
 package pl.rychellos.hotel.authorization.service.dto;
 
-public record AuthResultDTO(
-    AuthResponseDTO authResponseDTO,
-    String refreshToken,
-    String username
-) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResultDTO {
+    private AuthResponseDTO authResponseDTO;
+    private String refreshToken;
+    private String username;
 }

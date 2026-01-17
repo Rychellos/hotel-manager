@@ -1,8 +1,20 @@
 package pl.rychellos.hotel.authorization.service.dto;
 
-public record AuthResponseOAuth2DTO(
-    String access_token,
-    String refresh_token,
-    String token_type
-) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class AuthResponseOAuth2DTO {
+    @JsonProperty("access_token")
+    private String accessToken;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
+    @JsonProperty("token_type")
+    private String tokenType;
 }
