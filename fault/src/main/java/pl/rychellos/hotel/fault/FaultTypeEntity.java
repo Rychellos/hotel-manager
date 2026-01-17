@@ -1,10 +1,9 @@
 package pl.rychellos.hotel.fault;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 import lombok.*;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.util.UUID;
 
 @Entity
 @Getter

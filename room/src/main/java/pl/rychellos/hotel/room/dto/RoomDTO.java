@@ -1,12 +1,11 @@
 package pl.rychellos.hotel.room.dto;
 
+import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.lib.BaseDTO;
-
-import java.math.BigDecimal;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor

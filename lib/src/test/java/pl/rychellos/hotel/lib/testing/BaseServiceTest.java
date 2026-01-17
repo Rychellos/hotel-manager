@@ -1,6 +1,10 @@
 package pl.rychellos.hotel.lib.testing;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,18 +17,8 @@ import pl.rychellos.hotel.lib.*;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
-
 @ExtendWith(MockitoExtension.class)
-public abstract class BaseServiceTest<
-    Entity extends BaseEntity,
-    DTO extends BaseDTO,
-    Service extends GenericService<Entity, DTO, ?, Repository>,
-    Repository extends GenericRepository<Entity>
-    > {
+public abstract class BaseServiceTest<Entity extends BaseEntity, DTO extends BaseDTO, Service extends GenericService<Entity, DTO, ?, Repository>, Repository extends GenericRepository<Entity>> {
 
     protected Repository repository;
     protected GenericMapper<Entity, DTO> mapper;
@@ -49,7 +43,7 @@ public abstract class BaseServiceTest<
     protected abstract DTO createDTO(Long id);
 
     @Test
-    void getById_ShouldReturnDto_WhenExists() {
+    void getById_ShouldReturnDto_WhenExists() throws Exception {
         /// Given
         Long id = 1L;
         Entity entity = createEntity(id);
@@ -67,7 +61,7 @@ public abstract class BaseServiceTest<
     }
 
     @Test
-    void getByPublicId_ShouldReturnDto_WhenExists() {
+    void getByPublicId_ShouldReturnDto_WhenExists() throws Exception {
         /// Given
         java.util.UUID publicId = java.util.UUID.randomUUID();
         Entity entity = createEntity(1L);
@@ -85,7 +79,7 @@ public abstract class BaseServiceTest<
     }
 
     @Test
-    void delete_ShouldCallRepository_WhenExists() {
+    void delete_ShouldCallRepository_WhenExists() throws Exception {
         /// Given
         long id = 1L;
         Mockito.when(repository.existsById(id)).thenReturn(true);

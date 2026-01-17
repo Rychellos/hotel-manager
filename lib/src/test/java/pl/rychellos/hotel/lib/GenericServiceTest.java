@@ -1,6 +1,11 @@
 package pl.rychellos.hotel.lib;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,12 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class GenericServiceTest {
@@ -41,29 +40,23 @@ class GenericServiceTest {
     private interface TestRepository extends GenericRepository<TestEntity> {
     }
 
-    private static class TestService extends GenericService<
-        TestEntity,
-        TestDTO,
-        TestFilter,
-        TestRepository
-        > {
+    private static class TestService extends GenericService<TestEntity, TestDTO, TestFilter, TestRepository> {
         public TestService(
-            LangUtil langUtil,
-            GenericMapper<TestEntity, TestDTO> mapper,
-            TestRepository repository,
-            ApplicationExceptionFactory exceptionFactory,
-            ObjectMapper objectMapper
-        ) {
+                LangUtil langUtil,
+                GenericMapper<TestEntity, TestDTO> mapper,
+                TestRepository repository,
+                ApplicationExceptionFactory exceptionFactory,
+                ObjectMapper objectMapper) {
             super(langUtil, TestDTO.class, mapper, repository, exceptionFactory, objectMapper);
         }
 
         @Override
-        protected void fetchRelations(TestEntity entity, TestDTO dto) {
+        protected void fetchRelations(TestEntity entity, TestDTO dto) throws ApplicationException {
             // No-op for base testing
         }
 
         @Override
-        public TestDTO getByPublicId(UUID publicId) {
+        public TestDTO getByPublicId(UUID publicId) throws ApplicationException {
             return super.getByPublicId(publicId);
         }
 
@@ -90,7 +83,7 @@ class GenericServiceTest {
     }
 
     @Test
-    void getById_ShouldReturnDto_WhenEntityExists() {
+    void getById_ShouldReturnDto_WhenEntityExists() throws ApplicationException {
         // Given
         TestEntity entity = new TestEntity();
         TestDTO dto = new TestDTO();
@@ -111,7 +104,7 @@ class GenericServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.empty());
         when(langUtil.getMessage(anyString())).thenReturn("Not Found %s %s");
         when(exceptionFactory.resourceNotFound(anyString()))
-            .thenReturn(new ApplicationException("Title", "Detail", null));
+                .thenReturn(new ApplicationException("Title", "Detail", null));
 
         // When & Then
         assertThrows(ApplicationException.class, () -> service.getById(1L));
@@ -119,7 +112,7 @@ class GenericServiceTest {
     }
 
     @Test
-    void delete_ShouldCallRepository_WhenExists() {
+    void delete_ShouldCallRepository_WhenExists() throws ApplicationException {
         // Given
         when(repository.existsById(1L)).thenReturn(true);
 
@@ -131,7 +124,7 @@ class GenericServiceTest {
     }
 
     @Test
-    void getByPublicId_ShouldReturnDto_WhenEntityExists() {
+    void getByPublicId_ShouldReturnDto_WhenEntityExists() throws ApplicationException {
         // Given
         UUID publicId = UUID.randomUUID();
         TestEntity entity = new TestEntity();

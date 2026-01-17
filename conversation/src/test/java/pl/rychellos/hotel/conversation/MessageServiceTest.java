@@ -1,6 +1,11 @@
 package pl.rychellos.hotel.conversation;
 
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,12 +16,6 @@ import pl.rychellos.hotel.conversation.dto.MessageDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.media.MediaRepository;
-
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MessageServiceTest {
@@ -48,7 +47,7 @@ class MessageServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldSetConversationAndAuthor_WhenIdsPresent() {
+    void fetchRelations_ShouldSetConversationAndAuthor_WhenIdsPresent() throws Exception {
         // Given
         MessageDTO dto = new MessageDTO();
         dto.setConversationId(1L);

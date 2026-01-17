@@ -3,6 +3,8 @@ package pl.rychellos.hotel.webapi;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.security.Principal;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springdoc.core.converters.models.PageableAsQueryParam;
@@ -23,13 +25,11 @@ import pl.rychellos.hotel.authorization.user.dto.UserDTO;
 import pl.rychellos.hotel.authorization.user.dto.UserFilterDTO;
 import pl.rychellos.hotel.lib.GenericController;
 import pl.rychellos.hotel.lib.JSONPatchDTO;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
-
-import java.security.Principal;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -53,7 +53,7 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @Operation(summary = "Fetch details of all users present.")
     public Page<UserDTO> getUsers(
             @Parameter(hidden = true) @PageableDefault(size = 50) Pageable pageable,
-            @ParameterObject UserFilterDTO filter) {
+            @ParameterObject UserFilterDTO filter) throws ApplicationException {
         log.info("Loading user detail table");
         return super.getPage(pageable, filter);
     }
@@ -61,7 +61,7 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch details about single user by id or UUID")
-    public ResponseEntity<UserDTO> getById(@PathVariable String idOrUuid) {
+    public ResponseEntity<UserDTO> getById(@PathVariable String idOrUuid) throws ApplicationException {
         log.info("Loading detail about single user");
 
         return ResponseEntity.ok(super.getOne(idOrUuid));
@@ -70,16 +70,22 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @GetMapping("/{idOrUuid}/roles")
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch list of roles that single user have")
-    public ResponseEntity<List<RoleDTO>> getRolesById(@PathVariable String idOrUuid) {
+    public ResponseEntity<List<RoleDTO>> getRolesById(@PathVariable String idOrUuid) throws ApplicationException {
         log.info("Loading list of roles for single user");
 
-        return ResponseEntity.ok(super.getOne(idOrUuid).getRoleIds().stream().map(roleService::getById).toList());
+        List<RoleDTO> roles = new java.util.ArrayList<>();
+        for (Long id : super.getOne(idOrUuid).getRoleIds()) {
+            roles.add(roleService.getById(id));
+        }
+
+        return ResponseEntity.ok(roles);
     }
 
     @GetMapping("/{idOrUuid}/permissions")
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch list of permission that single user have")
-    public ResponseEntity<List<PermissionDTO>> getPermissionsById(@PathVariable String idOrUuid) {
+    public ResponseEntity<List<PermissionDTO>> getPermissionsById(@PathVariable String idOrUuid)
+            throws ApplicationException {
         log.info("Loading list of permissions for single user");
 
         return ResponseEntity.ok(service.getPermissions(this.resolveId(idOrUuid)));
@@ -88,7 +94,7 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @PostMapping
     @CheckPermission(target = "USER", action = ActionType.CREATE, scope = ActionScope.ONE)
     @Operation(summary = "Creates new user")
-    public ResponseEntity<UserDTO> create(UserCreateDTO userCreateDTO) {
+    public ResponseEntity<UserDTO> create(UserCreateDTO userCreateDTO) throws ApplicationException {
         log.info("Creating new user: {}", userCreateDTO.getUsername());
 
         var userDTO = new UserDTO();
@@ -107,7 +113,7 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @Operation(summary = "Sets user details")
     public ResponseEntity<UserDTO> put(
             @PathVariable String idOrUuid,
-            @RequestBody UserDTO userDTO) {
+            @RequestBody UserDTO userDTO) throws ApplicationException {
         return ResponseEntity.ok(this.putOne(idOrUuid, userDTO));
     }
 
@@ -116,14 +122,14 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @Operation(summary = "Updates user details")
     public ResponseEntity<UserDTO> patch(
             @PathVariable String idOrUuid,
-            @RequestBody JSONPatchDTO userDTO) {
+            @RequestBody JSONPatchDTO userDTO) throws ApplicationException {
         return ResponseEntity.ok(this.patchOne(idOrUuid, userDTO));
     }
 
     @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "USER", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Deletes user")
-    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) {
+    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) throws ApplicationException {
         this.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }
@@ -132,7 +138,7 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.SELF)
     @Operation(summary = "Fetches information about currently logged in user")
     public ResponseEntity<UserDTO> me(
-            Principal principal) {
+            Principal principal) throws ApplicationException {
         return ResponseEntity.ok(service.getByUsername(principal.getName()));
     }
 }

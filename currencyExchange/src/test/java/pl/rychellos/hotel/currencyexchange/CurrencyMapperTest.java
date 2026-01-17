@@ -1,13 +1,12 @@
 package pl.rychellos.hotel.currencyexchange;
 
-import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
-import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.mapstruct.factory.Mappers;
+import pl.rychellos.hotel.currencyexchange.dto.CurrencyDTO;
 
 class CurrencyMapperTest {
     private final CurrencyMapper mapper = Mappers.getMapper(CurrencyMapper.class);

@@ -1,5 +1,13 @@
 package pl.rychellos.hotel.authorization.aspect;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,15 +24,6 @@ import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.authorization.configuration.CustomPermissionEvaluator;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
-
-import java.util.Collections;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(classes = SecurityAspectTest.Config.class)
 public class SecurityAspectTest {

@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.authorization.user;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,127 +17,125 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Mock
-    private UserRepository userRepository;
+        @Mock
+        private UserRepository userRepository;
 
-    @Mock
-    private ApplicationExceptionFactory exceptionFactory;
+        @Mock
+        private ApplicationExceptionFactory exceptionFactory;
 
-    @Mock
-    private LangUtil langUtil;
+        @Mock
+        private LangUtil langUtil;
 
-    @InjectMocks
-    private UserService userService;
+        @InjectMocks
+        private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        assertNotNull(userService);
-    }
+        @BeforeEach
+        void setUp() {
+                assertNotNull(userService);
+        }
 
-    @Test
-    void updatePassword_success() {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("john");
-        userEntity.setPassword("oldPassword");
+        @Test
+        void updatePassword_success() throws Exception {
+                UserEntity userEntity = new UserEntity();
+                userEntity.setUsername("john");
+                userEntity.setPassword("oldPassword");
 
-        when(userRepository.findByUsername("john")).thenReturn(Optional.of(userEntity));
-        when(userRepository.save(any(UserEntity.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                when(userRepository.findByUsername("john")).thenReturn(Optional.of(userEntity));
+                when(userRepository.save(any(UserEntity.class)))
+                                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserDetails result = userService.updatePassword(userEntity, "newPassword");
+                UserDetails result = userService.updatePassword(userEntity, "newPassword");
 
-        assertNotNull(result);
-        assertEquals("newPassword", result.getPassword());
+                assertNotNull(result);
+                assertEquals("newPassword", result.getPassword());
 
-        verify(userRepository).findByUsername("john");
-        verify(userRepository).save(userEntity);
-    }
+                verify(userRepository).findByUsername("john");
+                verify(userRepository).save(userEntity);
+        }
 
-    @Test
-    void updatePassword_userNotFound() {
-        when(userRepository.findByUsername("missing")).thenReturn(Optional.empty());
-        when(langUtil.getMessage("error.user.notFound.byUsername", "missing"))
-                .thenReturn("User with username missing not found");
+        @Test
+        void updatePassword_userNotFound() throws Exception {
+                when(userRepository.findByUsername("missing")).thenReturn(Optional.empty());
+                when(langUtil.getMessage("error.user.notFound.byUsername", "missing"))
+                                .thenReturn("User with username missing not found");
 
-        ApplicationException applicationException = new ApplicationException(
-                "Resource not found",
-                "User with username missing not found",
-                HttpStatus.NOT_FOUND);
+                ApplicationException applicationException = new ApplicationException(
+                                "Resource not found",
+                                "User with username missing not found",
+                                HttpStatus.NOT_FOUND);
 
-        when(exceptionFactory.resourceNotFound("User with username missing not found"))
-                .thenReturn(applicationException);
+                when(exceptionFactory.resourceNotFound("User with username missing not found"))
+                                .thenReturn(applicationException);
 
-        UserEntity principal = new UserEntity();
-        principal.setUsername("missing");
+                UserEntity principal = new UserEntity();
+                principal.setUsername("missing");
 
-        ApplicationException thrown = assertThrows(
-                ApplicationException.class,
-                () -> userService.updatePassword(principal, "password"));
+                RuntimeException thrown = assertThrows(
+                                RuntimeException.class,
+                                () -> userService.updatePassword(principal, "password"));
 
-        assertEquals(HttpStatus.NOT_FOUND, thrown.getStatus());
-        assertEquals("Resource not found", thrown.getTitle());
-        assertEquals("User with username missing not found", thrown.getDetail());
+                assertTrue(thrown.getCause() instanceof ApplicationException);
+                ApplicationException cause = (ApplicationException) thrown.getCause();
 
-        verify(userRepository).findByUsername("missing");
-        verify(userRepository, never()).save(any());
-    }
+                assertEquals(HttpStatus.NOT_FOUND, cause.getStatus());
+                assertEquals("Resource not found", cause.getTitle());
+                assertEquals("User with username missing not found", cause.getDetail());
 
-    @Test
-    void loadUserByUsername_success() {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setUsername("alice");
-        userEntity.setPassword("password");
+                verify(userRepository).findByUsername("missing");
+                verify(userRepository, never()).save(any());
+        }
 
-        when(userRepository.findByUsername("alice")).thenReturn(Optional.of(userEntity));
+        @Test
+        void loadUserByUsername_success() {
+                UserEntity userEntity = new UserEntity();
+                userEntity.setUsername("alice");
+                userEntity.setPassword("password");
 
-        UserDetails result = userService.loadUserByUsername("alice");
+                when(userRepository.findByUsername("alice")).thenReturn(Optional.of(userEntity));
 
-        assertNotNull(result);
-        assertEquals("alice", result.getUsername());
+                UserDetails result = userService.loadUserByUsername("alice");
 
-        verify(userRepository).findByUsername("alice");
-    }
+                assertNotNull(result);
+                assertEquals("alice", result.getUsername());
 
-    @Test
-    void loadUserByUsername_userNotFound() {
-        when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
-        when(langUtil.getMessage("error.user.notFound.byUsername", "unknown"))
-                .thenReturn("User with username unknown not found");
+                verify(userRepository).findByUsername("alice");
+        }
 
-        UsernameNotFoundException thrown = assertThrows(
-                UsernameNotFoundException.class,
-                () -> userService.loadUserByUsername("unknown"));
+        @Test
+        void loadUserByUsername_userNotFound() {
+                when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
+                when(langUtil.getMessage("error.user.notFound.byUsername", "unknown"))
+                                .thenReturn("User with username unknown not found");
 
-        assertEquals("User with username unknown not found", thrown.getMessage());
+                UsernameNotFoundException thrown = assertThrows(
+                                UsernameNotFoundException.class,
+                                () -> userService.loadUserByUsername("unknown"));
 
-        verify(userRepository).findByUsername("unknown");
-    }
+                assertEquals("User with username unknown not found", thrown.getMessage());
 
-    @Test
-    void loadUserByUsername_nullOrEmpty() {
-        when(langUtil.getMessage("error.user.username.empty"))
-                .thenReturn("Username cannot be empty");
+                verify(userRepository).findByUsername("unknown");
+        }
 
-        // Test null
-        UsernameNotFoundException thrownNull = assertThrows(
-                UsernameNotFoundException.class,
-                () -> userService.loadUserByUsername(null));
-        assertEquals("Username cannot be empty", thrownNull.getMessage());
+        @Test
+        void loadUserByUsername_nullOrEmpty() {
+                when(langUtil.getMessage("error.user.username.empty"))
+                                .thenReturn("Username cannot be empty");
 
-        // Test empty
-        UsernameNotFoundException thrownEmpty = assertThrows(
-                UsernameNotFoundException.class,
-                () -> userService.loadUserByUsername(""));
-        assertEquals("Username cannot be empty", thrownEmpty.getMessage());
+                // Test null
+                UsernameNotFoundException thrownNull = assertThrows(
+                                UsernameNotFoundException.class,
+                                () -> userService.loadUserByUsername(null));
+                assertEquals("Username cannot be empty", thrownNull.getMessage());
 
-        verify(langUtil, times(2)).getMessage("error.user.username.empty");
-    }
+                // Test empty
+                UsernameNotFoundException thrownEmpty = assertThrows(
+                                UsernameNotFoundException.class,
+                                () -> userService.loadUserByUsername(""));
+                assertEquals("Username cannot be empty", thrownEmpty.getMessage());
+
+                verify(langUtil, times(2)).getMessage("error.user.username.empty");
+        }
 }

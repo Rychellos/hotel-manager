@@ -1,5 +1,7 @@
 package pl.rychellos.hotel.authorization.token;
 
+import java.time.Instant;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,6 @@ import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.time.Instant;
-import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
@@ -22,16 +21,15 @@ public class RefreshTokenService {
     private final ApplicationExceptionFactory applicationExceptionFactory;
 
     public RefreshTokenService(
-        RefreshTokenRepository refreshTokenRepository,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+            RefreshTokenRepository refreshTokenRepository,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil) {
         this.refreshTokenRepository = refreshTokenRepository;
         this.applicationExceptionFactory = applicationExceptionFactory;
         this.langUtil = langUtil;
     }
 
-    public RefreshTokenEntity createRefreshToken(UserEntity user) {
+    public RefreshTokenEntity createRefreshToken(UserEntity user) throws ApplicationException {
         RefreshTokenEntity refreshToken = new RefreshTokenEntity();
         refreshToken.setUser(user);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
@@ -42,8 +40,7 @@ public class RefreshTokenService {
             return refreshTokenRepository.save(refreshToken);
         } catch (Exception e) {
             throw applicationExceptionFactory.internalServerError(
-                langUtil.getMessage("error.token.refresh.creation")
-            );
+                    langUtil.getMessage("error.token.refresh.creation"));
         }
     }
 
@@ -52,21 +49,19 @@ public class RefreshTokenService {
     }
 
     public RefreshTokenEntity verifyExpiration(
-        RefreshTokenEntity token
-    ) throws ApplicationException {
+            RefreshTokenEntity token) throws ApplicationException {
         if (token.isExpired()) {
             refreshTokenRepository.delete(token);
 
             throw applicationExceptionFactory.forbidden(
-                langUtil.getMessage("error.token.refresh.expired")
-            );
+                    langUtil.getMessage("error.token.refresh.expired"));
         }
 
         return token;
     }
 
     @Transactional
-    public void revokeToken(String tokenHash) {
+    public void revokeToken(String tokenHash) throws ApplicationException {
         refreshTokenRepository.findByTokenHash(tokenHash).ifPresent(token -> {
             token.setRevoked(true);
             refreshTokenRepository.save(token);
@@ -85,8 +80,8 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteByExpiryDateBefore(Instant.now());
     }
 
-    public RefreshTokenEntity findByToken(String token) {
+    public RefreshTokenEntity findByToken(String token) throws ApplicationException {
         return refreshTokenRepository.findByTokenHash(token)
-            .orElseThrow(() -> applicationExceptionFactory.resourceNotFound("Refresh token is not in database!"));
+                .orElseThrow(() -> applicationExceptionFactory.resourceNotFound("Refresh token is not in database!"));
     }
 }

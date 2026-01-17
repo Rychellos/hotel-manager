@@ -1,24 +1,23 @@
 package pl.rychellos.hotel.authorization.role;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import pl.rychellos.hotel.authorization.permission.PermissionMapper;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
+import pl.rychellos.hotel.authorization.permission.PermissionMapper;
 import pl.rychellos.hotel.authorization.permission.PermissionRepository;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.authorization.user.UserRepository;
 import pl.rychellos.hotel.lib.testing.BaseServiceTest;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, RoleRepository> {
 
@@ -78,7 +77,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     }
 
     @Test
-    void fetchRelations_ShouldSetPermissionsAndUsers_WhenIdsAreProvided() {
+    void fetchRelations_ShouldSetPermissionsAndUsers_WhenIdsAreProvided() throws Exception {
         /// Given
         RoleEntity entity = createEntity(1L);
         RoleDTO dto = createDTO(1L);
@@ -109,7 +108,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     }
 
     @Test
-    void fetchRelations_ShouldClearCollections_WhenIdsAreEmpty() {
+    void fetchRelations_ShouldClearCollections_WhenIdsAreEmpty() throws Exception {
         /// Given
         RoleEntity entity = createEntity(1L);
         entity.getPermissions().add(new PermissionEntity());
@@ -131,7 +130,7 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     }
 
     @Test
-    void fetchRelations_ShouldIgnoreCollections_WhenIdsAreNull() {
+    void fetchRelations_ShouldIgnoreCollections_WhenIdsAreNull() throws Exception {
         /// Given
         RoleEntity entity = createEntity(1L);
         PermissionEntity existingPerm = new PermissionEntity();

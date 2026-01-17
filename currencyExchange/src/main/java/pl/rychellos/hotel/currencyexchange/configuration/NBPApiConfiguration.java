@@ -1,5 +1,7 @@
 package pl.rychellos.hotel.currencyexchange.configuration;
 
+import java.net.http.HttpClient;
+import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ssl.SslBundles;
@@ -9,9 +11,6 @@ import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer;
 import org.springframework.web.service.registry.ImportHttpServices;
 import pl.rychellos.hotel.currencyexchange.NBPApi;
-
-import javax.net.ssl.SSLContext;
-import java.net.http.HttpClient;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)

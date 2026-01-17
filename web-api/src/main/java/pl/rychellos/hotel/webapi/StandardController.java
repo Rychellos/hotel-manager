@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
 import pl.rychellos.hotel.lib.GenericController;
 import pl.rychellos.hotel.lib.JSONPatchDTO;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.lib.security.ActionScope;
@@ -28,18 +29,12 @@ import pl.rychellos.hotel.room.dto.StandardFilterDTO;
 @RestController
 @RequestMapping("/api/v1/standards")
 @Tag(name = "Standards", description = "Endpoints for managing room standards")
-public class StandardController extends GenericController<
-    StandardEntity,
-    StandardDTO,
-    StandardFilterDTO,
-    StandardRepository,
-    StandardService
-    > {
+public class StandardController
+        extends GenericController<StandardEntity, StandardDTO, StandardFilterDTO, StandardRepository, StandardService> {
     public StandardController(
-        StandardService service,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+            StandardService service,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil) {
         super(service, applicationExceptionFactory, langUtil);
     }
 
@@ -48,25 +43,22 @@ public class StandardController extends GenericController<
     @CheckPermission(target = "STANDARD", action = ActionType.READ, scope = ActionScope.PAGINATED)
     @Operation(summary = "Fetch all standards paginated")
     public Page<StandardDTO> getStandards(
-        @Parameter(hidden = true)
-        @PageableDefault(size = 50)
-        Pageable pageable,
-        @ParameterObject StandardFilterDTO filter
-    ) {
+            @Parameter(hidden = true) @PageableDefault(size = 50) Pageable pageable,
+            @ParameterObject StandardFilterDTO filter) throws ApplicationException {
         return super.getPage(pageable, filter);
     }
 
     @GetMapping("/{idOrUuid}")
     @CheckPermission(target = "STANDARD", action = ActionType.READ, scope = ActionScope.ONE)
     @Operation(summary = "Fetch single standard by id or UUID")
-    public ResponseEntity<StandardDTO> getById(@PathVariable String idOrUuid) {
+    public ResponseEntity<StandardDTO> getById(@PathVariable String idOrUuid) throws ApplicationException {
         return ResponseEntity.ok(super.getOne(idOrUuid));
     }
 
     @PostMapping
     @CheckPermission(target = "STANDARD", action = ActionType.CREATE, scope = ActionScope.ONE)
     @Operation(summary = "Create new standard")
-    public ResponseEntity<StandardDTO> create(@RequestBody StandardDTO dto) {
+    public ResponseEntity<StandardDTO> create(@RequestBody StandardDTO dto) throws ApplicationException {
         return ResponseEntity.ok(super.createOne(dto));
     }
 
@@ -74,9 +66,8 @@ public class StandardController extends GenericController<
     @CheckPermission(target = "STANDARD", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Update standard")
     public ResponseEntity<StandardDTO> update(
-        @PathVariable String idOrUuid,
-        @RequestBody StandardDTO dto
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody StandardDTO dto) throws ApplicationException {
         return ResponseEntity.ok(super.putOne(idOrUuid, dto));
     }
 
@@ -84,16 +75,15 @@ public class StandardController extends GenericController<
     @CheckPermission(target = "STANDARD", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Patch standard")
     public ResponseEntity<StandardDTO> patch(
-        @PathVariable String idOrUuid,
-        @RequestBody JSONPatchDTO patch
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody JSONPatchDTO patch) throws ApplicationException {
         return ResponseEntity.ok(super.patchOne(idOrUuid, patch));
     }
 
     @DeleteMapping("/{idOrUuid}")
     @CheckPermission(target = "STANDARD", action = ActionType.DELETE, scope = ActionScope.ONE)
     @Operation(summary = "Delete standard")
-    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) {
+    public ResponseEntity<Void> delete(@PathVariable String idOrUuid) throws ApplicationException {
         super.deleteOne(idOrUuid);
         return ResponseEntity.ok().build();
     }

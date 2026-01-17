@@ -1,15 +1,13 @@
 package pl.rychellos.hotel.room;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import pl.rychellos.hotel.room.dto.RoomDTO;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import pl.rychellos.hotel.room.dto.RoomDTO;
 
 // Since RoomMapper uses StandardMapper, and they are both MapStruct mappers with componentModel = "spring",
 // it might be easier to test them in a Spring context or manually wire them.

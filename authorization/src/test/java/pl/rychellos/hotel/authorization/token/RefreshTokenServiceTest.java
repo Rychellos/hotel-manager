@@ -1,5 +1,11 @@
 package pl.rychellos.hotel.authorization.token;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.Instant;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,13 +17,6 @@ import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.time.Instant;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshTokenServiceTest {
@@ -41,7 +40,7 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void createRefreshToken_ShouldSaveAndReturnToken() {
+    void createRefreshToken_ShouldSaveAndReturnToken() throws Exception {
         /// Given
         UserEntity user = new UserEntity();
         user.setId(1L);
@@ -66,7 +65,8 @@ class RefreshTokenServiceTest {
         expiredToken.setExpiryDate(Instant.now().minusSeconds(60)); // 1 minute ago
 
         when(langUtil.getMessage("error.token.refresh.expired")).thenReturn("Token expired");
-        when(exceptionFactory.forbidden("Token expired")).thenReturn(new ApplicationException("Forbidden", "Token expired", null));
+        when(exceptionFactory.forbidden("Token expired"))
+                .thenReturn(new ApplicationException("Forbidden", "Token expired", null));
 
         /// When & Then
         assertThrows(ApplicationException.class, () -> refreshTokenService.verifyExpiration(expiredToken));
@@ -74,7 +74,7 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void verifyExpiration_ShouldReturnToken_WhenNotExpired() {
+    void verifyExpiration_ShouldReturnToken_WhenNotExpired() throws Exception {
         /// Given
         RefreshTokenEntity validToken = new RefreshTokenEntity();
         validToken.setExpiryDate(Instant.now().plusSeconds(60));
@@ -88,7 +88,7 @@ class RefreshTokenServiceTest {
     }
 
     @Test
-    void revokeToken_ShouldSetRevokedTrue_WhenFound() {
+    void revokeToken_ShouldSetRevokedTrue_WhenFound() throws Exception {
         /// Given
         String hash = "some-hash";
         RefreshTokenEntity token = new RefreshTokenEntity();
@@ -108,7 +108,8 @@ class RefreshTokenServiceTest {
         /// Given
         String hash = "missing-hash";
         when(refreshTokenRepository.findByTokenHash(hash)).thenReturn(Optional.empty());
-        when(exceptionFactory.resourceNotFound(anyString())).thenReturn(new ApplicationException("Not Found", "Missing", null));
+        when(exceptionFactory.resourceNotFound(anyString()))
+                .thenReturn(new ApplicationException("Not Found", "Missing", null));
 
         /// When & Then
         assertThrows(ApplicationException.class, () -> refreshTokenService.findByToken(hash));

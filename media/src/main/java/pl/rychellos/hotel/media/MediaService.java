@@ -1,18 +1,18 @@
 package pl.rychellos.hotel.media;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.rychellos.hotel.lib.GenericService;
+import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.media.dto.MediaDTO;
 import pl.rychellos.hotel.media.dto.MediaFilterDTO;
 import pl.rychellos.hotel.storage.StorageService;
-
-import java.io.IOException;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -20,13 +20,12 @@ public class MediaService extends GenericService<MediaEntity, MediaDTO, MediaFil
     private final StorageService storageService;
 
     public MediaService(
-        LangUtil langUtil,
-        MediaMapper mapper,
-        MediaRepository repository,
-        ApplicationExceptionFactory exceptionFactory,
-        ObjectMapper objectMapper,
-        StorageService storageService
-    ) {
+            LangUtil langUtil,
+            MediaMapper mapper,
+            MediaRepository repository,
+            ApplicationExceptionFactory exceptionFactory,
+            ObjectMapper objectMapper,
+            StorageService storageService) {
         super(langUtil, MediaDTO.class, mapper, repository, exceptionFactory, objectMapper);
         this.storageService = storageService;
     }
@@ -45,26 +44,27 @@ public class MediaService extends GenericService<MediaEntity, MediaDTO, MediaFil
         storageService.store(file.getBytes(), storedPath);
 
         MediaEntity entity = MediaEntity.builder()
-            .publicId(publicId)
-            .originalFilename(originalFilename)
-            .contentType(contentType)
-            .fileSize(fileSize)
-            .storedPath(storedPath)
-            .ownerId(ownerId)
-            .isPublic(isPublic)
-            .type(contentType != null && contentType.startsWith("image/") ? MediaType.IMAGE : MediaType.FILE)
-            .url("/api/v1/media/" + uuidStr)
-            .build();
+                .publicId(publicId)
+                .originalFilename(originalFilename)
+                .contentType(contentType)
+                .fileSize(fileSize)
+                .storedPath(storedPath)
+                .ownerId(ownerId)
+                .isPublic(isPublic)
+                .type(contentType != null && contentType.startsWith("image/") ? MediaType.IMAGE : MediaType.FILE)
+                .url("/api/v1/media/" + uuidStr)
+                .build();
 
         return mapper.toDTO(repository.save(entity));
     }
 
     private String getExtension(String filename) {
-        if (filename == null || !filename.contains(".")) return "";
+        if (filename == null || !filename.contains("."))
+            return "";
         return filename.substring(filename.lastIndexOf("."));
     }
 
     @Override
-    protected void fetchRelations(MediaEntity entity, MediaDTO dto) {
+    protected void fetchRelations(MediaEntity entity, MediaDTO dto) throws ApplicationException {
     }
 }

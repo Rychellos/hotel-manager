@@ -1,12 +1,11 @@
 package pl.rychellos.hotel.fault;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.*;
 import pl.rychellos.hotel.conversation.ConversationEntity;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Getter

@@ -1,5 +1,7 @@
 package pl.rychellos.hotel.authorization.configuration;
 
+import java.io.Serializable;
+import java.util.Objects;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
@@ -8,9 +10,6 @@ import org.springframework.stereotype.Component;
 import pl.rychellos.hotel.lib.security.ActionScope;
 import pl.rychellos.hotel.lib.security.ActionType;
 import pl.rychellos.hotel.lib.security.PermissionDef;
-
-import java.io.Serializable;
-import java.util.Objects;
 
 @Component
 public class CustomPermissionEvaluator implements PermissionEvaluator {

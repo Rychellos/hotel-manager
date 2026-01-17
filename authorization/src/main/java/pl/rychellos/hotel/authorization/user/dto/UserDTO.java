@@ -1,11 +1,10 @@
 package pl.rychellos.hotel.authorization.user.dto;
 
-import lombok.Data;
-import pl.rychellos.hotel.lib.BaseDTO;
-
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
+import lombok.Data;
+import pl.rychellos.hotel.lib.BaseDTO;
 
 @Data
 public class UserDTO implements BaseDTO {

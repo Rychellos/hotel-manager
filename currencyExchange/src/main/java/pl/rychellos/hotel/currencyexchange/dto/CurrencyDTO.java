@@ -1,12 +1,11 @@
 package pl.rychellos.hotel.currencyexchange.dto;
 
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.lib.BaseDTO;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Data
 @AllArgsConstructor

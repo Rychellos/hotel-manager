@@ -1,14 +1,13 @@
 package pl.rychellos.hotel.authorization.permission;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.role.RoleEntity;
-
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class PermissionMapperTest {
     private final PermissionMapper mapper = Mappers.getMapper(PermissionMapper.class);

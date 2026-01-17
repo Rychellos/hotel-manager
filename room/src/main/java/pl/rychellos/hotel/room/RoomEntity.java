@@ -1,13 +1,12 @@
 package pl.rychellos.hotel.room;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.math.BigDecimal;
-import java.util.UUID;
 
 @Entity
 @Data

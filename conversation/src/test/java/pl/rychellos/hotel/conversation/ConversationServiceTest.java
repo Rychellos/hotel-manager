@@ -1,6 +1,12 @@
 package pl.rychellos.hotel.conversation;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,15 +16,6 @@ import pl.rychellos.hotel.authorization.user.UserRepository;
 import pl.rychellos.hotel.conversation.dto.ConversationDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ConversationServiceTest {
@@ -45,7 +42,7 @@ class ConversationServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldSetParticipants_WhenParticipantIdsPresent() {
+    void fetchRelations_ShouldSetParticipants_WhenParticipantIdsPresent() throws Exception {
         // Given
         ConversationDTO dto = new ConversationDTO();
         dto.setParticipantIds(Set.of(1L, 2L));

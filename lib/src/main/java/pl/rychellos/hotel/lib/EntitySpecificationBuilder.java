@@ -1,13 +1,12 @@
 package pl.rychellos.hotel.lib;
 
 import jakarta.persistence.criteria.*;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
-
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 public class EntitySpecificationBuilder<DTO extends BaseEntity> {

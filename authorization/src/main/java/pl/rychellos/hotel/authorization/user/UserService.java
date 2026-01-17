@@ -1,6 +1,10 @@
 package pl.rychellos.hotel.authorization.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -21,53 +25,44 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationException;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
-public class UserService extends GenericService<
-    UserEntity,
-    UserDTO,
-    UserFilterDTO,
-    UserRepository
-    > implements UserDetailsPasswordService, UserDetailsService {
+public class UserService extends GenericService<UserEntity, UserDTO, UserFilterDTO, UserRepository>
+        implements UserDetailsPasswordService, UserDetailsService {
     private final PermissionMapper permissionMapper;
     private final RoleService roleService;
     private final RoleRepository roleRepository;
 
     public UserService(
-        UserRepository repository,
-        UserMapper mapper,
-        ApplicationExceptionFactory exceptionFactory,
-        LangUtil langUtil,
-        ObjectMapper objectMapper, PermissionMapper permissionMapper, RoleService roleService, RoleRepository roleRepository) {
+            UserRepository repository,
+            UserMapper mapper,
+            ApplicationExceptionFactory exceptionFactory,
+            LangUtil langUtil,
+            ObjectMapper objectMapper, PermissionMapper permissionMapper, RoleService roleService,
+            RoleRepository roleRepository) {
         super(langUtil, UserDTO.class, mapper, repository, exceptionFactory, objectMapper);
         this.permissionMapper = permissionMapper;
         this.roleService = roleService;
         this.roleRepository = roleRepository;
     }
 
-    public List<PermissionDTO> getPermissions(Long id) {
+    public List<PermissionDTO> getPermissions(Long id) throws ApplicationException {
         return repository.findById(id).orElseThrow(() -> applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byId", id.toString())
-            ))
-            .getRoles().stream().flatMap(role -> role.getPermissions().stream())
-            .map(permissionMapper::toDTO)
-            .collect(Collectors.toList());
+                langUtil.getMessage("error.user.notFound.byId", id.toString())))
+                .getRoles().stream().flatMap(role -> role.getPermissions().stream())
+                .map(permissionMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     private UserEntity updatePasswordInternal(String username, String newPassword) throws ApplicationException {
         Optional<UserEntity> optionalUserEntity = this.repository.findByUsername(username);
 
         if (optionalUserEntity.isEmpty()) {
-            log.info("Tried to change password of user with username {}, but user with this username doesn't exist", username);
+            log.info("Tried to change password of user with username {}, but user with this username doesn't exist",
+                    username);
 
             throw applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byUsername", username)
-            );
+                    langUtil.getMessage("error.user.notFound.byUsername", username));
         }
 
         log.info("Changed {}'s password", username);
@@ -88,14 +83,18 @@ public class UserService extends GenericService<
     }
 
     @Override
-    public UserDetails updatePassword(@NonNull UserDetails user, @Nullable String newPassword) throws ApplicationException {
-        return this.updatePasswordInternal(user.getUsername(), newPassword);
+    public UserDetails updatePassword(@NonNull UserDetails user, @Nullable String newPassword) {
+        try {
+            return this.updatePasswordInternal(user.getUsername(), newPassword);
+        } catch (ApplicationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private UserEntity fetchByUsername(String username) throws UsernameNotFoundException {
         if (username == null || username.isBlank()) {
             throw new UsernameNotFoundException(
-                langUtil.getMessage("error.user.username.empty"));
+                    langUtil.getMessage("error.user.username.empty"));
         }
 
         Optional<UserEntity> optionalUserEntity = this.repository.findByUsername(username);
@@ -104,8 +103,7 @@ public class UserService extends GenericService<
             log.error("Tried to fetch user with username {}, but user with this username doesn't exist", username);
 
             throw new UsernameNotFoundException(
-                langUtil.getMessage("error.user.notFound.byUsername", username)
-            );
+                    langUtil.getMessage("error.user.notFound.byUsername", username));
         }
 
         return optionalUserEntity.get();
@@ -129,7 +127,7 @@ public class UserService extends GenericService<
     }
 
     @Override
-    protected void fetchRelations(UserEntity entity, UserDTO dto) {
+    protected void fetchRelations(UserEntity entity, UserDTO dto) throws ApplicationException {
         if (dto.getRoleIds() != null) {
             if (dto.getRoleIds().isEmpty()) {
                 entity.getRoles().clear();

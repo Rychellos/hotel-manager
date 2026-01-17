@@ -1,13 +1,12 @@
 package pl.rychellos.hotel.currencyexchange;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @Entity
 @Table(name = "currency")

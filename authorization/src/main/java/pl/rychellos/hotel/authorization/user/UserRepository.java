@@ -1,7 +1,7 @@
 package pl.rychellos.hotel.authorization.user;
 
-import pl.rychellos.hotel.lib.GenericRepository;
 import org.springframework.stereotype.Repository;
+import pl.rychellos.hotel.lib.GenericRepository;
 
 @Repository
 public interface UserRepository extends GenericRepository<UserEntity> {

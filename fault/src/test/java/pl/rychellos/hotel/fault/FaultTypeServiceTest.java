@@ -1,5 +1,7 @@
 package pl.rychellos.hotel.fault;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pl.rychellos.hotel.fault.dto.FaultTypeDTO;
 import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
-
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
 class FaultTypeServiceTest {

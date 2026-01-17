@@ -1,9 +1,8 @@
 package pl.rychellos.hotel.authorization.permission;
 
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import pl.rychellos.hotel.lib.GenericRepository;
-
-import java.util.Optional;
 
 @Repository
 public interface PermissionRepository extends GenericRepository<PermissionEntity> {

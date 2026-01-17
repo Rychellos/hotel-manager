@@ -1,5 +1,9 @@
 package pl.rychellos.hotel.media;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,12 +16,6 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 import pl.rychellos.hotel.media.dto.MediaDTO;
 import pl.rychellos.hotel.storage.StorageService;
-
-import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MediaServiceTest {
@@ -44,7 +42,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void upload_ShouldStoreFileAndSaveMetadata() throws IOException {
+    void upload_ShouldStoreFileAndSaveMetadata() throws Exception {
         // Given
         MultipartFile file = mock(MultipartFile.class);
         byte[] bytes = "test data".getBytes();
@@ -76,7 +74,7 @@ class MediaServiceTest {
     }
 
     @Test
-    void fetchRelations_ShouldDoNothing() {
+    void fetchRelations_ShouldDoNothing() throws Exception {
         // Given
         MediaEntity entity = new MediaEntity();
         MediaDTO dto = new MediaDTO();

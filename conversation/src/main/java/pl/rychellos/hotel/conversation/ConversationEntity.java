@@ -1,16 +1,15 @@
 package pl.rychellos.hotel.conversation;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.rychellos.hotel.authorization.user.UserEntity;
 import pl.rychellos.hotel.lib.BaseEntity;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Data
