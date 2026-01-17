@@ -3,6 +3,7 @@ package pl.rychellos.hotel.authorization.role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import pl.rychellos.hotel.authorization.permission.PermissionMapper;
 import pl.rychellos.hotel.authorization.permission.PermissionEntity;
 import pl.rychellos.hotel.authorization.permission.PermissionRepository;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
@@ -33,6 +34,9 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private PermissionMapper permissionMapper;
+
     @BeforeEach
     void setUp() {
         /// We link our specific mock to the generic parent field
@@ -40,16 +44,17 @@ class RoleServiceTest extends BaseServiceTest<RoleEntity, RoleDTO, RoleService, 
 
         this.repository = roleRepository;
 
-        /// Initialize service with generic mocks from the parent and specific mocks from here
+        /// Initialize service with generic mocks from the parent and specific mocks
+        /// from here
         this.service = new RoleService(
-            repository,
-            roleMapper,
-            exceptionFactory,
-            langUtil,
-            objectMapper,
-            permissionRepository,
-            userRepository
-        );
+                repository,
+                roleMapper,
+                exceptionFactory,
+                langUtil,
+                objectMapper,
+                permissionRepository,
+                userRepository,
+                permissionMapper);
     }
 
     @Override

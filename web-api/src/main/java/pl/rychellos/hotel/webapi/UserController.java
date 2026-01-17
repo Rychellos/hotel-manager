@@ -12,7 +12,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.rychellos.hotel.authorization.annotation.CheckPermission;
-import pl.rychellos.hotel.authorization.permission.PermissionService;
 import pl.rychellos.hotel.authorization.permission.dto.PermissionDTO;
 import pl.rychellos.hotel.authorization.role.RoleService;
 import pl.rychellos.hotel.authorization.role.dto.RoleDTO;
@@ -36,24 +35,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "Users", description = "Endpoints for managing users")
-public class UserController extends GenericController<
-    UserEntity,
-    UserDTO,
-    UserFilterDTO,
-    UserRepository,
-    UserService
-    > {
+public class UserController extends GenericController<UserEntity, UserDTO, UserFilterDTO, UserRepository, UserService> {
     private final RoleService roleService;
-    private final PermissionService permissionService;
 
     public UserController(
-        UserService service,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil,
-        RoleService roleService, PermissionService permissionService) {
+            UserService service,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil,
+            RoleService roleService) {
         super(service, applicationExceptionFactory, langUtil);
         this.roleService = roleService;
-        this.permissionService = permissionService;
     }
 
     @GetMapping
@@ -61,12 +52,8 @@ public class UserController extends GenericController<
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.PAGINATED)
     @Operation(summary = "Fetch details of all users present.")
     public Page<UserDTO> getUsers(
-        @Parameter(hidden = true)
-        @PageableDefault(size = 50)
-        Pageable pageable,
-        @ParameterObject
-        UserFilterDTO filter
-    ) {
+            @Parameter(hidden = true) @PageableDefault(size = 50) Pageable pageable,
+            @ParameterObject UserFilterDTO filter) {
         log.info("Loading user detail table");
         return super.getPage(pageable, filter);
     }
@@ -119,9 +106,8 @@ public class UserController extends GenericController<
     @CheckPermission(target = "USER", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Sets user details")
     public ResponseEntity<UserDTO> put(
-        @PathVariable String idOrUuid,
-        @RequestBody UserDTO userDTO
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(this.putOne(idOrUuid, userDTO));
     }
 
@@ -129,9 +115,8 @@ public class UserController extends GenericController<
     @CheckPermission(target = "USER", action = ActionType.EDIT, scope = ActionScope.ONE)
     @Operation(summary = "Updates user details")
     public ResponseEntity<UserDTO> patch(
-        @PathVariable String idOrUuid,
-        @RequestBody JSONPatchDTO userDTO
-    ) {
+            @PathVariable String idOrUuid,
+            @RequestBody JSONPatchDTO userDTO) {
         return ResponseEntity.ok(this.patchOne(idOrUuid, userDTO));
     }
 
@@ -147,8 +132,7 @@ public class UserController extends GenericController<
     @CheckPermission(target = "USER", action = ActionType.READ, scope = ActionScope.SELF)
     @Operation(summary = "Fetches information about currently logged in user")
     public ResponseEntity<UserDTO> me(
-        Principal principal
-    ) {
+            Principal principal) {
         return ResponseEntity.ok(service.getByUsername(principal.getName()));
     }
 }
