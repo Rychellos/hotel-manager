@@ -33,13 +33,12 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     public AuthService(
-        UserRepository userRepository,
-        JwtService jwtService,
-        AuthenticationManager authenticationManager,
-        RefreshTokenService refreshTokenService,
-        ApplicationExceptionFactory exceptionFactory,
-        LangUtil langUtil, PasswordEncoder passwordEncoder
-    ) {
+            UserRepository userRepository,
+            JwtService jwtService,
+            AuthenticationManager authenticationManager,
+            RefreshTokenService refreshTokenService,
+            ApplicationExceptionFactory exceptionFactory,
+            LangUtil langUtil, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -57,16 +56,13 @@ public class AuthService {
 
     public AuthResultDTO authenticate(AuthRequestDTO request) {
         authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(
-                request.username(),
-                request.password()
-            )
-        );
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()));
 
-        UserEntity user = userRepository.findByUsername(request.username())
-            .orElseThrow(() -> exceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.user.notFound.byUsername").formatted(request.username())
-            ));
+        UserEntity user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> exceptionFactory.resourceNotFound(
+                        langUtil.getMessage("error.user.notFound.byUsername").formatted(request.getUsername())));
 
         String jwtToken = jwtService.generateToken(user);
         RefreshTokenEntity refreshToken = refreshTokenService.createRefreshToken(user);
@@ -78,13 +74,13 @@ public class AuthService {
 
     private AuthResponseDTO buildAuthResponse(UserEntity user, String jwtToken) {
         Set<String> roles = user.getRoles().stream()
-            .map(RoleEntity::getInternalName)
-            .collect(Collectors.toSet());
+                .map(RoleEntity::getInternalName)
+                .collect(Collectors.toSet());
 
         Set<String> permissions = user.getRoles().stream()
-            .flatMap(role -> role.getPermissions().stream())
-            .map(PermissionEntity::getName)
-            .collect(Collectors.toSet());
+                .flatMap(role -> role.getPermissions().stream())
+                .map(PermissionEntity::getName)
+                .collect(Collectors.toSet());
 
         return new AuthResponseDTO(jwtToken, roles, permissions);
     }
@@ -111,19 +107,19 @@ public class AuthService {
 
     public ResponseCookie createRefreshTokenCookie(String refreshToken) {
         return ResponseCookie.from("refresh_token", refreshToken)
-            .httpOnly(true)
-            .secure(false)
-            .path("/api/")
-            .maxAge(Duration.ofDays(7))
-            .build();
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/")
+                .maxAge(Duration.ofDays(7))
+                .build();
     }
 
     public ResponseCookie createLogoutCookie() {
         return ResponseCookie.from("refresh_token", "")
-            .httpOnly(true)
-            .secure(false)
-            .path("/api/")
-            .maxAge(0)
-            .build();
+                .httpOnly(true)
+                .secure(false)
+                .path("/api/")
+                .maxAge(0)
+                .build();
     }
 }

@@ -60,8 +60,8 @@ class AuthServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("access-token", result.authResponseDTO().accessToken());
-        assertEquals("dummy-refresh-hash", result.refreshToken());
+        assertEquals("access-token", result.getAuthResponseDTO().getAccessToken());
+        assertEquals("dummy-refresh-hash", result.getRefreshToken());
         verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
@@ -83,7 +83,7 @@ class AuthServiceTest {
         AuthResultDTO result = authService.refreshToken(oldRefreshToken);
 
         // Then
-        assertEquals("new-access-token", result.authResponseDTO().accessToken());
+        assertEquals("new-access-token", result.getAuthResponseDTO().getAccessToken());
         assertEquals(1L, entity.getAccessTokenCount());
         verify(refreshTokenService).save(entity);
     }

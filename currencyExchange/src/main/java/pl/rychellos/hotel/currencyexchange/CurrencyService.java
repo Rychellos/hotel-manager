@@ -18,29 +18,25 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class CurrencyService extends GenericService<
-    CurrencyEntity,
-    CurrencyDTO,
-    CurrencyFilterDTO,
-    CurrencyRepository
-    > implements ICurrencyService {
+public class CurrencyService extends GenericService<CurrencyEntity, CurrencyDTO, CurrencyFilterDTO, CurrencyRepository>
+        implements ICurrencyService {
     protected CurrencyRepository repository;
     protected ICurrencyClient currencyClient;
 
     protected CurrencyService(
-        LangUtil langUtil,
-        CurrencyMapper mapper,
-        CurrencyRepository repository,
-        ApplicationExceptionFactory exceptionFactory,
-        ObjectMapper objectMapper,
-        ICurrencyClient currencyClient
-    ) {
+            LangUtil langUtil,
+            CurrencyMapper mapper,
+            CurrencyRepository repository,
+            ApplicationExceptionFactory exceptionFactory,
+            ObjectMapper objectMapper,
+            ICurrencyClient currencyClient) {
         super(langUtil, CurrencyDTO.class, mapper, repository, exceptionFactory, objectMapper);
         this.repository = repository;
         this.currencyClient = currencyClient;
     }
 
-    // @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    // @Cacheable(cacheNames = "currency", key = "#currencyCode + '_' +
+    // #effectiveDate")
     public CurrencyDTO get(String currencyCode, LocalDate effectiveDate) throws ApplicationException {
         currencyCode = currencyCode.toUpperCase();
         log.info("Checking if rate for {} on day {} is present in database...", currencyCode, effectiveDate);
@@ -58,45 +54,41 @@ public class CurrencyService extends GenericService<
             currencyFetch = currencyClient.getRate(currencyCode);
         } catch (HttpClientErrorException e) {
             throw applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode)
-            );
+                    langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode));
         }
 
-        CurrencyRateDTO currencyRate = currencyFetch.rates().getFirst();
+        CurrencyRateDTO currencyRate = currencyFetch.getRates().getFirst();
 
         if (currencyRate == null) {
             throw applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode)
-            );
+                    langUtil.getMessage("error.currency.notFound.message").formatted(currencyCode));
         }
 
         CurrencyDTO currencyDTO = new CurrencyDTO(
-            null,
-            java.util.UUID.randomUUID(),
-            currencyFetch.currency(),
-            currencyFetch.code(),
-            currencyRate.no(),
-            currencyRate.effectiveDate(),
-            currencyRate.mid()
-        );
+                null,
+                java.util.UUID.randomUUID(),
+                currencyFetch.getCurrency(),
+                currencyFetch.getCode(),
+                currencyRate.getNo(),
+                currencyRate.getEffectiveDate(),
+                currencyRate.getMid());
 
         return save(currencyDTO);
     }
 
-    // @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' + #effectiveDate")
+    // @CacheEvict(cacheNames = "currency", key = "#currencyCode + '_' +
+    // #effectiveDate")
     public void delete(
-        String currencyCode,
-        LocalDate effectiveDate
-    ) throws ApplicationException {
+            String currencyCode,
+            LocalDate effectiveDate) throws ApplicationException {
         super.delete(get(currencyCode, effectiveDate).getId());
     }
 
     @Override
     public double calculateExchangeRate(
-        String currencyCode,
-        LocalDate effectiveDate,
-        double amount
-    ) throws ApplicationException {
+            String currencyCode,
+            LocalDate effectiveDate,
+            double amount) throws ApplicationException {
         return amount / get(currencyCode, effectiveDate).getMid();
     }
 

@@ -34,11 +34,10 @@ public class AuthenticationController {
     private final LangUtil langUtil;
 
     public AuthenticationController(
-        AuthService authService,
-        UserService userService,
-        ApplicationExceptionFactory applicationExceptionFactory,
-        LangUtil langUtil
-    ) {
+            AuthService authService,
+            UserService userService,
+            ApplicationExceptionFactory applicationExceptionFactory,
+            LangUtil langUtil) {
         this.authService = authService;
         this.userService = userService;
         this.applicationExceptionFactory = applicationExceptionFactory;
@@ -47,71 +46,55 @@ public class AuthenticationController {
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     @SwaggerConfiguration.ApiProblemResponses(value = {
-        HttpStatus.UNAUTHORIZED,
-        HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.UNAUTHORIZED,
+            HttpStatus.INTERNAL_SERVER_ERROR
     })
-    @Operation(
-        summary = "Used for user login using username and password.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = {
-                @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
-                @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
-            }
-        )
-    )
+    @Operation(summary = "Used for user login using username and password.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
+            @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
+    }))
     public ResponseEntity<AuthResponseDTO> loginJson(
-        @RequestBody AuthRequestDTO request
-    ) throws ApplicationException {
-        log.info("Login attempt using \"application/json\" for user with username {}", request.username());
+            @RequestBody AuthRequestDTO request) throws ApplicationException {
+        log.info("Login attempt using \"application/json\" for user with username {}", request.getUsername());
 
         AuthResultDTO result = authService.authenticate(request);
-        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.getRefreshToken());
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .body(result.authResponseDTO());
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(result.getAuthResponseDTO());
     }
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @SwaggerConfiguration.ApiProblemResponses(value = {
-        HttpStatus.UNAUTHORIZED,
-        HttpStatus.INTERNAL_SERVER_ERROR
+            HttpStatus.UNAUTHORIZED,
+            HttpStatus.INTERNAL_SERVER_ERROR
     })
-    @Operation(
-        summary = "Used for user login using username and password.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            content = {
-                @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
-                @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
-            }
-        )
-    )
+    @Operation(summary = "Used for user login using username and password.", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(content = {
+            @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = AuthRequestDTO.class)),
+            @Content(mediaType = MediaType.APPLICATION_FORM_URLENCODED_VALUE, schema = @Schema(implementation = AuthRequestDTO.class))
+    }))
     public ResponseEntity<AuthResponseOAuth2DTO> loginForm(
-        @ModelAttribute AuthRequestDTO request
-    ) throws ApplicationException {
-        log.info("Login attempt using \"application/x-www-form-urlencoded\" for user with username {}", request.username());
+            @ModelAttribute AuthRequestDTO request) throws ApplicationException {
+        log.info("Login attempt using \"application/x-www-form-urlencoded\" for user with username {}",
+                request.getUsername());
 
         AuthResultDTO result = authService.authenticate(request);
-        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.getRefreshToken());
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .body(new AuthResponseOAuth2DTO(
-                result.authResponseDTO().accessToken(),
-                result.refreshToken(),
-                "Bearer"
-            ));
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(new AuthResponseOAuth2DTO(
+                        result.getAuthResponseDTO().getAccessToken(),
+                        result.getRefreshToken(),
+                        "Bearer"));
     }
 
     @PostMapping("/refresh")
     @Operation(summary = "Refreshes token located inside cookie and returns new login response.")
-    @ApiResponse(
-        responseCode = "200",
-        content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))
-    )
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = AuthResponseDTO.class)))
     public ResponseEntity<?> refresh(
-        @CookieValue(name = "refresh_token") String refreshToken
-    ) {
+            @CookieValue(name = "refresh_token") String refreshToken) {
         AuthResultDTO result;
         try {
             result = authService.refreshToken(refreshToken);
@@ -121,47 +104,44 @@ public class AuthenticationController {
             log.info("{}: {}", exception.getTitle(), exception.getDetail());
 
             return ResponseEntity
-                .status(exception.getStatus())
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(exception.getProblemDetail());
+                    .status(exception.getStatus())
+                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                    .body(exception.getProblemDetail());
         }
 
-        ResponseCookie cookie = authService.createRefreshTokenCookie(result.refreshToken());
+        ResponseCookie cookie = authService.createRefreshTokenCookie(result.getRefreshToken());
 
-        log.info("User with username {} refreshed token", result.username());
+        log.info("User with username {} refreshed token", result.getUsername());
 
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .body(result.authResponseDTO());
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(result.getAuthResponseDTO());
     }
 
     @PostMapping("/logout")
     @Operation(summary = "Deletes token located inside cookie and revokes it in database.")
     public ResponseEntity<Void> logout(
-        @CookieValue(name = "refresh_token") String refreshToken
-    ) {
+            @CookieValue(name = "refresh_token") String refreshToken) {
         authService.logout(refreshToken);
         ResponseCookie cookie = authService.createLogoutCookie();
 
         return ResponseEntity.noContent()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
-            .build();
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
     }
 
     @PostMapping("/changePassword")
     @Operation(summary = "Updates user's password")
     public ResponseEntity<UserDTO> updatePassword(
-        @RequestBody PasswordUpdateDTO passwordUpdateDTO,
-        Principal principal
-    ) {
+            @RequestBody PasswordUpdateDTO passwordUpdateDTO,
+            Principal principal) {
         String username = principal.getName();
 
-        if (authService.verifyPassword(username, passwordUpdateDTO.oldPassword())) {
-            return ResponseEntity.ok(userService.updatePassword(username, passwordUpdateDTO.newPassword()));
+        if (authService.verifyPassword(username, passwordUpdateDTO.getOldPassword())) {
+            return ResponseEntity.ok(userService.updatePassword(username, passwordUpdateDTO.getNewPassword()));
         } else {
             throw this.applicationExceptionFactory.badRequest(
-                langUtil.getMessage("error.user.password.change.message")
-            );
+                    langUtil.getMessage("error.user.password.change.message"));
         }
     }
 }

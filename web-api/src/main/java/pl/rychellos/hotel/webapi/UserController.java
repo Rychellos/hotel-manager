@@ -89,15 +89,15 @@ public class UserController extends GenericController<UserEntity, UserDTO, UserF
     @CheckPermission(target = "USER", action = ActionType.CREATE, scope = ActionScope.ONE)
     @Operation(summary = "Creates new user")
     public ResponseEntity<UserDTO> create(UserCreateDTO userCreateDTO) {
-        log.info("Creating new user: {}", userCreateDTO.username());
+        log.info("Creating new user: {}", userCreateDTO.getUsername());
 
         var userDTO = new UserDTO();
-        userDTO.setUsername(userCreateDTO.username());
-        userDTO.setEmail(userCreateDTO.email());
-        userDTO.setRoleIds(userCreateDTO.roleIds());
+        userDTO.setUsername(userCreateDTO.getUsername());
+        userDTO.setEmail(userCreateDTO.getEmail());
+        userDTO.setRoleIds(userCreateDTO.getRoleIds());
 
         userDTO = this.createOne(userDTO);
-        this.service.updatePassword(userDTO, userCreateDTO.password());
+        this.service.updatePassword(userDTO, userCreateDTO.getPassword());
 
         return ResponseEntity.ok(userDTO);
     }
