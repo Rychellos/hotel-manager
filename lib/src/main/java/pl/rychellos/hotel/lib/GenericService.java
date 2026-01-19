@@ -17,7 +17,7 @@ import pl.rychellos.hotel.lib.exceptions.ApplicationExceptionFactory;
 import pl.rychellos.hotel.lib.lang.LangUtil;
 
 public abstract class GenericService<Entity extends BaseEntity, DTO extends BaseDTO, Filter, Repository extends GenericRepository<Entity>>
-        implements IGenericService<Entity, DTO, Filter> {
+    implements IGenericService<Entity, DTO, Filter> {
     private final EntitySpecificationBuilder<Entity> specification = new EntitySpecificationBuilder<>();
     private final ObjectMapper objectMapper;
     private final Class<DTO> clazz;
@@ -28,12 +28,12 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     protected final ApplicationExceptionFactory applicationExceptionFactory;
 
     protected GenericService(
-            LangUtil langUtil,
-            Class<DTO> clazz,
-            GenericMapper<Entity, DTO> mapper,
-            Repository repository,
-            ApplicationExceptionFactory applicationExceptionFactory,
-            ObjectMapper objectMapper) {
+        LangUtil langUtil,
+        Class<DTO> clazz,
+        GenericMapper<Entity, DTO> mapper,
+        Repository repository,
+        ApplicationExceptionFactory applicationExceptionFactory,
+        ObjectMapper objectMapper) {
         this.langUtil = langUtil;
         this.repository = repository;
         this.mapper = mapper;
@@ -66,15 +66,15 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
 
     public DTO getById(long id) throws ApplicationException {
         return mapper.toDTO(repository.findById(id).orElseThrow(() -> applicationExceptionFactory.resourceNotFound(
-                langUtil.getMessage("error.generic.notFoundById.message")
-                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
+            langUtil.getMessage("error.generic.notFoundById.message")
+                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id))));
     }
 
     public DTO getByPublicId(UUID publicId) throws ApplicationException {
         return mapper.toDTO(repository.findByPublicId(publicId).orElseThrow(
-                () -> applicationExceptionFactory.resourceNotFound(
-                        langUtil.getMessage("error.generic.notFoundByPublicId.message")
-                                .formatted(StringUtils.capitalize(clazz.getSimpleName()), publicId))));
+            () -> applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.generic.notFoundByPublicId.message")
+                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), publicId))));
     }
 
     public boolean exists(long id) {
@@ -98,7 +98,7 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
     }
 
     public DTO saveIfNotExists(DTO dto) throws ApplicationException {
-        if (exists(dto.getId())) {
+        if (dto.getId() == null || exists(dto.getId())) {
             throw applicationExceptionFactory.conflict(langUtil.getMessage("error.generic.alreadyExists.message"));
         }
 
@@ -107,9 +107,9 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
 
     public DTO update(long id, DTO dto) throws ApplicationException {
         Entity entity = repository.findById(id).orElseThrow(
-                () -> applicationExceptionFactory.resourceNotFound(
-                        langUtil.getMessage("error.generic.notFoundById.message")
-                                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)));
+            () -> applicationExceptionFactory.resourceNotFound(
+                langUtil.getMessage("error.generic.notFoundById.message")
+                    .formatted(StringUtils.capitalize(clazz.getSimpleName()), id)));
 
         mapper.updateEntityFromDTO(entity, dto);
 
@@ -143,7 +143,7 @@ public abstract class GenericService<Entity extends BaseEntity, DTO extends Base
         }
 
         throw applicationExceptionFactory.methodNotAllowed(
-                langUtil.getMessage("error.generic.notFoundById.message")
-                        .formatted(StringUtils.capitalize(clazz.getSimpleName()), id));
+            langUtil.getMessage("error.generic.notFoundById.message")
+                .formatted(StringUtils.capitalize(clazz.getSimpleName()), id));
     }
 }

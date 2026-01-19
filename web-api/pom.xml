@@ -117,7 +117,7 @@
                             <resources>
                                 <resource>
                                     <directory>
-                                        ${project.parent.basedir}/web-frontend/dist/web-frontend/browser
+                                        ${project.parent.basedir}/web-frontend/.output/public
                                     </directory>
                                 </resource>
                             </resources>
