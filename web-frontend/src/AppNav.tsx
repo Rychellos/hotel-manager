@@ -8,6 +8,7 @@ import Shield from "lucide-solid/icons/shield-check";
 import Bed from "lucide-solid/icons/bed";
 import Key from "lucide-solid/icons/key";
 import Star from "lucide-solid/icons/star";
+import Search from "lucide-solid/icons/search";
 import { Permission } from "~/lib/api";
 import { UsePermissionsContext } from "./lib/PermissionsContext";
 
@@ -23,62 +24,71 @@ const navGroups: {
     };
   }[];
 }[] = [
-  {
-    groupName: "Hotel",
-    groupItems: [
-      {
-        requiredAuthority: "ROOM:READ:PAGINATED",
-        navItem: {
-          icon: Bed,
-          label: "",
-          title: "Pokoje",
-          url: "/room/",
+    {
+      groupName: "Hotel",
+      groupItems: [
+        {
+          requiredAuthority: "ROOM:READ:PAGINATED",
+          navItem: {
+            icon: Search,
+            label: "",
+            title: "Recepcja",
+            url: "/reception/",
+          },
         },
-      },
-      {
-        requiredAuthority: "STANDARD:READ:PAGINATED",
-        navItem: {
-          icon: Star,
-          label: "",
-          title: "Standardy",
-          url: "/standard/",
+        {
+          requiredAuthority: "ROOM:READ:PAGINATED",
+          navItem: {
+            icon: Bed,
+            label: "",
+            title: "Pokoje",
+            url: "/room/",
+          },
         },
-      },
-    ],
-  },
-  {
-    groupName: "Bezpieczeństwo:",
-    groupItems: [
-      {
-        requiredAuthority: "USER:READ:PAGINATED",
-        navItem: {
-          title: "Użytkownicy",
-          url: "/user/",
-          icon: User,
-          label: "",
+        {
+          requiredAuthority: "STANDARD:READ:PAGINATED",
+          navItem: {
+            icon: Star,
+            label: "",
+            title: "Standardy",
+            url: "/standard/",
+          },
         },
-      },
-      {
-        requiredAuthority: "ROLE:READ:PAGINATED",
-        navItem: {
-          title: "Role",
-          url: "/role/",
-          icon: Shield,
-          label: "",
+      ],
+    },
+    {
+      groupName: "Bezpieczeństwo:",
+      groupItems: [
+        {
+          requiredAuthority: "USER:READ:PAGINATED",
+          navItem: {
+            title: "Użytkownicy",
+            url: "/user/",
+            icon: User,
+            label: "",
+          },
         },
-      },
-      {
-        requiredAuthority: "PERMISSION:READ:PAGINATED",
-        navItem: {
-          title: "Permisjie",
-          url: "/permission/",
-          icon: Key,
-          label: "",
+        {
+          requiredAuthority: "ROLE:READ:PAGINATED",
+          navItem: {
+            title: "Role",
+            url: "/role/",
+            icon: Shield,
+            label: "",
+          },
         },
-      },
-    ],
-  },
-];
+        {
+          requiredAuthority: "PERMISSION:READ:PAGINATED",
+          navItem: {
+            title: "Permisjie",
+            url: "/permission/",
+            icon: Key,
+            label: "",
+          },
+        },
+      ],
+    },
+  ];
 
 const home: Omit<NavItemProps, "isCollapsed"> = {
   icon: House,
@@ -114,9 +124,9 @@ export default function AppNav(props: {
         .map((el) =>
           typeof el !== "string"
             ? ({
-                ...el.navItem,
-                isCollapsed: props.isCollapsed,
-              } as NavItemProps)
+              ...el.navItem,
+              isCollapsed: props.isCollapsed,
+            } as NavItemProps)
             : el
         )
     );
